@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atlas Rhythm</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00eaff">
+    <link rel="apple-touch-icon" href="icon.png">
+
+</head>
+<body>
+
+    <div id="menu-screen">
+        <div class="app-header">
+            <h1>ATLAS RHYTHM</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search songs...">
+            </div>
+        </div>
+
+        <div id="song-list-container">
+            </div>
+    </div>
+
+    <div id="profile-screen">
+        <div class="profile-container">
+            <h1>WHO IS PLAYING?</h1>
+            <div class="profile-list">
+                <button class="profile-btn" onclick="selectProfile('Atlas')">
+                    <div class="avatar" style="background: #00eaff;">A</div>
+                    <span>ATLAS</span>
+                </button>
+                <button class="profile-btn" onclick="selectProfile('Dad')">
+                    <div class="avatar" style="background: #ffd700;">D</div>
+                    <span>DAD</span>
+                </button>
+                <button class="profile-btn" onclick="selectProfile('Travis')">
+                    <div class="avatar" style="background: #ff0099;">T</div>
+                    <span>TRAVIS</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="current-player-tag">Playing as: <span id="player-name-display">...</span></div>
+
+    <div id="game-container" style="display: none;">
+        <button id="back-to-menu-btn"><i class="fas fa-arrow-left"></i></button>
+
+        <video id="bg-video" playsinline webkit-playsinline></video>
+        
+        <div id="track-overlay">
+            <div class="lane"></div>
+            <div class="lane"></div>
+            <div class="lane"></div>
+        </div>
+
+        <canvas id="game-canvas"></canvas>
+
+        <div id="ui-layer">
+            <div id="score">Score: 0</div>
+            
+            <div id="combo-hud" style="opacity: 0;">
+                <span id="combo-count">0</span>x
+                <div id="combo-label">COMBO</div>
+            </div>
+            <div id="multiplier-hud" style="opacity: 0;">
+                Multiplier: x<span id="multiplier-val">1</span>
+            </div>
+
+            <button id="start-btn">TAP TO START</button>
+            <button id="export-btn" style="display:none; position:absolute; bottom:20px; right:20px;">EXPORT JSON</button>
+        </div>
+        
+        <audio id="cheer-sfx" src="assets/audio/cheer.mp3" preload="auto"></audio>
+
+        <div id="results-screen" style="display: none;">
+            <div class="results-container">
+                <div class="results-header">
+                    <h1>AWESOME!</h1>
+                </div>
+
+                <div class="score-bubble">
+                    <div class="label">SCORE</div>
+                    <div id="final-score-val" class="big-number">0</div>
+                </div>
+
+                <div class="highscore-bubble">
+                    <div class="icon">👑</div>
+                    <div class="text">
+                        <div class="label">MAX COMBO</div>
+                        <div id="final-combo-val">0</div>
+                    </div>
+                </div>
+                
+                <div class="leaderboard-box">
+                    <h3>TOP SCORERS</h3>
+                    <ul id="leaderboard-list">
+                        </ul>
+                </div>
+                
+                <div class="results-buttons">
+                    <button id="replay-btn" class="btn-primary">
+                        <i class="fas fa-redo"></i> REPLAY
+                    </button>
+                    <button id="menu-btn" class="btn-secondary">
+                        <i class="fas fa-home"></i> MENU
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/input.js"></script>
+    <script src="js/note-manager.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/game.js"></script>
+    
+    <script>
+        function selectProfile(name) {
+            window.currentPlayer = name;
+            document.getElementById('player-name-display').innerText = name;
+            document.getElementById('profile-screen').style.display = 'none';
+        }
+    </script>
+    
+    <script src="js/menu.js"></script> 
+
+    <script>
+    // Register the Service Worker for Offline Play
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('SW Registration Failed', err));
+        });
+    }
+</script>
+</body>
+
+</body>
+</html>

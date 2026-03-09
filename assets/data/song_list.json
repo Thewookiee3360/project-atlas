@@ -1,0 +1,130 @@
+[
+  {
+    "id": "harry-styles-as-it-was",
+    "title": "As It Was",
+    "artist": "Harry Styles",
+    "video": "assets/video/as_it_was.mp4",
+    "data": "assets/data/as_it_was.json",
+    "difficulty": "Normal"
+  },
+  {
+    "id": "no-batido",
+    "title": "No Batido",
+    "artist": "ZXKAI",
+    "video": "assets/video/no_batido.mp4",
+    "data": "assets/data/no_batido.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "passo-bem-solto",
+    "title": "Passo Bem Solto",
+    "artist": "Slowed Remix",
+    "video": "assets/video/passo_solto.mp4",
+    "data": "assets/data/passo_solto.json",
+    "difficulty": "Normal"
+  },
+  {
+    "id": "los-volanie",
+    "title": "Los Volanie",
+    "artist": "Phonk",
+    "video": "assets/video/los_volanie.mp4",
+    "data": "assets/data/los_volanie.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "montagem-tomoada",
+    "title": "Montagem Tomoada",
+    "artist": "Slowed",
+    "video": "assets/video/montagem.mp4",
+    "data": "assets/data/montagem.json",
+    "difficulty": "Expert"
+  },
+  {
+    "id": "pinkpantheress",
+    "title": "Just for me",
+    "artist": "PinkPantheress",
+    "video": "assets/video/pinkpantheress.mp4",
+    "data": "assets/data/pinkpantheress.json",
+    "difficulty": "Normal"
+  },
+  {
+    "id": "metamorphosis",
+    "title": "Metamorphosis",
+    "artist": "Interworld",
+    "video": "assets/video/metamorphosis.mp4",
+    "data": "assets/data/metamorphosis.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "close-eyes",
+    "title": "Close Eyes",
+    "artist": "DVRST",
+    "video": "assets/video/close_eyes.mp4",
+    "data": "assets/data/close_eyes.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "murder-in-my-mind",
+    "title": "Murder In My Mind",
+    "artist": "Kordhell",
+    "video": "assets/video/murder_in_my_mind.mp4",
+    "data": "assets/data/murder_in_my_mind.json",
+    "difficulty": "Expert"
+  },
+  {
+    "id": "rush-e",
+    "title": "Rush E",
+    "artist": "Sheet Music Boss",
+    "video": "assets/video/rush_e.mp4",
+    "data": "assets/data/rush_e.json",
+    "difficulty": "Expert"
+  },
+  {
+    "id": "neon-blade",
+    "title": "Neon Blade",
+    "artist": "MoonDeity",
+    "video": "assets/video/neon_blade.mp4",
+    "data": "assets/data/neon_blade.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "bones",
+    "title": "Bones",
+    "artist": "Imagine Dragons",
+    "video": "assets/video/bones.mp4",
+    "data": "assets/data/bones.json",
+    "difficulty": "Normal"
+  },
+  {
+    "id": "narcissistic",
+    "title": "NPD",
+    "artist": "Odetari",
+    "video": "assets/video/narcissistic.mp4",
+    "data": "assets/data/narcissistic.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "toxic",
+    "title": "Toxic",
+    "artist": "BoyWithUke",
+    "video": "assets/video/toxic.mp4",
+    "data": "assets/data/toxic.json",
+    "difficulty": "Normal"
+  },
+  {
+    "id": "bbno$ vnlla",
+    "title": "bing bong",
+    "artist": "bbno$",
+    "video": "assets/video/bingbong.mp4",
+    "data": "assets/data/bingbong.json",
+    "difficulty": "Hard"
+  },
+  {
+    "id": "kpop hunters",
+    "title": "golden",
+    "artist": "huntrix",
+    "video": "assets/video/golden.mp4",
+    "data": "assets/data/golden.json",
+    "difficulty": "Hard"
+  }
+]

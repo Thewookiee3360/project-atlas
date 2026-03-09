@@ -1,0 +1,15 @@
+{
+  "title": "Test Song",
+  "bpm": 120,
+  "offset": 0,
+  "notes": [
+    { "time": 2.0, "lane": 0, "type": "tap" },
+    { "time": 3.0, "lane": 1, "type": "tap" },
+    { "time": 4.0, "lane": 2, "type": "tap" },
+    
+    { "time": 6.0, "lane": 1, "type": "hold", "duration": 2.0 }, 
+    
+    { "time": 9.0, "lane": 0, "type": "tap" },
+    { "time": 9.5, "lane": 2, "type": "tap" }
+  ]
+}
