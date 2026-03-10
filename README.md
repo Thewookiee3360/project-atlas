@@ -1,4 +1,4 @@
-# Project Atlas
+# Project Atlas 2025
 
 A rhythm game project.
 
