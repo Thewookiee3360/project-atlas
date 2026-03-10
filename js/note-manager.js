@@ -1,111 +1,84 @@
 class NoteManager {
     constructor(game) {
         this.game = game;
-        this.notes = [];
-        this.activeNotes = [];
+        this.notes = [];       
+        this.activeNotes = []; 
+        this.laneWidth = 0;    
         
-        this.approachTime = 1.5; 
-        this.nextNoteIndex = 0;
-        this.hitWindow = 0.3; // 300ms window
+        this.noteSpeed = 2.0; 
+        this.hitLineY = 0.85; 
     }
 
-    async loadSong(url) {
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            this.notes = data.notes.sort((a, b) => a.time - b.time);
-            console.log("Song loaded:", data.title);
-        } catch (err) {
-            console.error("Failed to load song:", err);
-        }
+    loadSong(songData) {
+        let extractedNotes = [];
+        if (Array.isArray(songData)) extractedNotes = songData;
+        else if (songData && Array.isArray(songData.notes)) extractedNotes = songData.notes; 
+        else if (songData && Array.isArray(songData.data)) extractedNotes = songData.data; 
+
+        this.notes = JSON.parse(JSON.stringify(extractedNotes));
+        this.activeNotes = [];
     }
 
-    update(songTime) {
-        // 1. SPAWN NOTES
-        while (this.nextNoteIndex < this.notes.length) {
-            const noteData = this.notes[this.nextNoteIndex];
-            if (songTime + this.approachTime >= noteData.time) {
-                this.spawnNote(noteData);
-                this.nextNoteIndex++;
-            } else {
-                break;
+    update(currentTime) {
+        if (!this.notes) return;
+
+        const spawnWindow = currentTime + this.noteSpeed;
+        
+        for (let i = 0; i < this.notes.length; i++) {
+            const note = this.notes[i];
+            if (note.time <= spawnWindow) {
+                this.activeNotes.push(note);
+                this.notes.splice(i, 1);
+                i--; 
             }
         }
 
-        // 2. UPDATE ACTIVE NOTES
         for (let i = this.activeNotes.length - 1; i >= 0; i--) {
             const note = this.activeNotes[i];
-            const endTime = note.time + (note.duration || 0);
-
-            // --- HOLD LOGIC START ---
-            if (note.isHolding) {
-                // Check if user is STILL holding the lane?
-                if (this.game.input.lanes[note.lane]) {
-                    // YES: They are holding.
-                    // Add Score continuously (every frame)
-                    this.game.score += 1; 
-                    this.game.scoreEl.innerText = "Score: " + this.game.score;
-                    
-                    // Spawn Sparks continuously
-                    if (Math.random() > 0.5) { // 50% chance per frame to save performance
-                        this.game.spawnExplosion(note.lane); 
-                    }
-
-                    // Check if the hold is finished
-                    if (songTime >= endTime) {
-                        // DONE!
-                        this.activeNotes.splice(i, 1);
-                        this.game.combo++; // Extra combo for finishing
-                        console.log("Hold Complete!");
-                    }
-                } else {
-                    // NO: They let go early!
-                    note.isHolding = false;
-                    console.log("Dropped Hold!");
-                    // It becomes a normal falling note again (and will likely miss)
+            
+            // --- HOLD NOTE LOGIC ---
+            if (note.isHeld) {
+                note.y = this.game.canvas.height * this.hitLineY;
+                
+                if (currentTime >= note.time + note.duration) {
+                    this.activeNotes.splice(i, 1);
+                    if(this.game.handleHoldComplete) this.game.handleHoldComplete(note.lane);
+                } else if (!this.game.input.lanes[note.lane]) {
+                    this.activeNotes.splice(i, 1);
+                    if(this.game.handleHoldBreak) this.game.handleHoldBreak(note.lane);
                 }
-            }
-            // --- HOLD LOGIC END ---
+            } else {
+                // --- NORMAL FALLING LOGIC ---
+                const timeUntilHit = note.time - currentTime;
+                const progress = 1 - (timeUntilHit / this.noteSpeed);
+                note.y = (progress * this.game.canvas.height * this.hitLineY);
 
-            // Cleanup: If the END of the note has passed the hit window + buffer, remove it
-            if (songTime > endTime + this.hitWindow) {
-                this.activeNotes.splice(i, 1);
-                // Reset combo if it wasn't a completed hold
-                if (!note.isHolding) {
-                    this.game.combo = 0;
+                let holdDelay = (note.duration || 0) > 0 ? (note.duration / this.noteSpeed) * this.game.canvas.height : 0;
+
+                if (note.y > this.game.canvas.height + 100 + holdDelay) {
+                    this.activeNotes.splice(i, 1);
+                    if(this.game.handleMiss) this.game.handleMiss(); 
                 }
             }
         }
     }
 
-    spawnNote(noteData) {
-        this.activeNotes.push({
-            time: noteData.time,
-            lane: noteData.lane,
-            type: noteData.type,
-            duration: noteData.duration || 0,
-            isHolding: false // New flag to track state
-        });
-    }
+    checkHit(lane, currentTime) {
+        const hitWindow = 0.30; 
 
-    checkHit(lane, songTime) {
         for (let i = 0; i < this.activeNotes.length; i++) {
             const note = this.activeNotes[i];
 
-            if (note.lane === lane && !note.isHolding) {
-                // Check collision with the HEAD of the note
-                const timeDiff = Math.abs(note.time - songTime);
-
-                if (timeDiff <= this.hitWindow) {
-                    // HIT!
-                    if (note.duration > 0) {
-                        // It's a Hold Note -> Enable Holding Mode
-                        note.isHolding = true;
-                        return true; // Return true to trigger the initial "Bang"
+            if (note.lane === lane && !note.isHeld) {
+                const timeDiff = Math.abs(note.time - currentTime);
+                
+                if (timeDiff <= hitWindow) {
+                    if (note.duration && note.duration > 0) {
+                        note.isHeld = true;
+                        return 'hold_start';
                     } else {
-                        // Normal Note -> Remove immediately
                         this.activeNotes.splice(i, 1);
-                        return true;
+                        return 'tap';
                     }
                 }
             }
@@ -113,75 +86,90 @@ class NoteManager {
         return false;
     }
 
+    // --- DRAWING SECTION (SEMI-TRANSPARENT & LESS BRIGHT) ---
     draw(ctx) {
-        const currentSongTime = this.game.video.currentTime;
+        if (!this.game.laneWidth) return; 
         const laneWidth = this.game.laneWidth;
-        const hitLineY = this.game.canvas.height * 0.85;
-        const speed = hitLineY / this.approachTime;
-
+        
         this.activeNotes.forEach(note => {
-            let y, tailLength;
+            const x = (note.lane * laneWidth) + (laneWidth / 2);
+            const y = note.y;
+            // Get the new semi-transparent rgba color
+            const baseColor = this.getNoteColor(note.lane);
 
-            // VISUAL LOGIC: Is it being held?
-            if (note.isHolding) {
-                // PIN TO BOTTOM: The head stays at the hit line
-                y = hitLineY;
-                
-                // TAIL SHRINKS: Calculate how much time is left
-                const endTime = note.time + note.duration;
-                const timeLeft = endTime - currentSongTime;
-                tailLength = timeLeft * speed;
-                
-            } else {
-                // FALLING NORMALLY
-                const timeUntilHit = note.time - currentSongTime;
-                y = hitLineY - (speed * timeUntilHit);
-                
-                // Tail is constant length
-                tailLength = note.duration * speed;
-            }
-
-            const x = note.lane * laneWidth;
-            const padding = 8;
-            const noteHeight = 40;
-            const cornerRadius = 10;
-
-            // 1. DRAW TAIL (If it exists)
-            if (tailLength > 0) {
-                ctx.save();
-                ctx.globalAlpha = 0.6;
-                ctx.fillStyle = note.isHolding ? '#FFFFFF' : '#00eaff'; // White if holding, Blue if falling
-                
-                const tailX = x + padding + 10;
-                const tailWidth = laneWidth - (padding * 2) - 20;
-                
-                // Draw Upwards from Y
-                ctx.fillRect(tailX, y - tailLength, tailWidth, tailLength);
-                ctx.restore();
-            }
-
-            // 2. DRAW HEAD
-            ctx.save();
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = note.isHolding ? '#FFFFFF' : '#00eaff'; // Glow white if holding
+            const w = laneWidth * 0.7; 
+            let h = 50; 
             
-            const grad = ctx.createLinearGradient(x, y - (noteHeight/2), x, y + (noteHeight/2));
-            grad.addColorStop(0, '#00eaff');
-            grad.addColorStop(1, '#008c99');
+            if (note.duration && note.duration > 0) {
+                if (note.isHeld) {
+                    const remainingTime = (note.time + note.duration) - this.game.video.currentTime;
+                    h = (remainingTime / this.noteSpeed) * (ctx.canvas.height * this.hitLineY);
+                } else {
+                    h = (note.duration / this.noteSpeed) * (ctx.canvas.height * this.hitLineY);
+                }
+            }
+            if (isNaN(h) || h < 50) h = 50;
 
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.roundRect(x + padding, y - (noteHeight/2), laneWidth - (padding*2), noteHeight, cornerRadius);
+            ctx.save(); 
+
+            // 1. The Glow (Reduced intensity)
+            ctx.shadowBlur = 10; // Reduced from 20 for less brightness
+            ctx.shadowColor = baseColor; // The glow itself is now semi-transparent too
+            ctx.fillStyle = baseColor;
+
+            const drawX = x - (w / 2);
+            const drawY = y - h;
+            const radius = 12;
+
+            // 2. Draw Rounded Body (Semi-transparent fill)
+            this.drawRoundedPath(ctx, drawX, drawY, w, h, radius);
             ctx.fill();
 
-            // Highlight
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.beginPath();
-            ctx.roundRect(x + padding + 5, y - (noteHeight/2) + 5, laneWidth - (padding*2) - 10, noteHeight/2 - 5, cornerRadius);
-            ctx.fill();
+            // 3. Draw White Border (Kept opaque for definition)
+            ctx.lineWidth = 2; // Slightly thinner border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            this.drawRoundedPath(ctx, drawX, drawY, w, h, radius);
+            ctx.stroke();
 
-            ctx.restore();
+            // 4. Draw "Hold Line" Stream (Toned down brightness)
+            if (h > 60) { 
+                ctx.beginPath();
+                ctx.moveTo(x, drawY + radius); 
+                ctx.lineTo(x, y - radius);     
+                ctx.lineWidth = 4;
+                // Toned down from 0.9 opacity to 0.5
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; 
+                ctx.shadowBlur = 5; // Reduced glow on the center line
+                ctx.shadowColor = 'white'; 
+                ctx.stroke();
+            }
+
+            ctx.restore(); 
         });
+    }
+
+    // Helper function for rounded rectangles
+    drawRoundedPath(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+    }
+
+    getNoteColor(lane) {
+        // CHANGED to RGBA for 60% opacity (semi-transparent)
+        const colors = [
+            'rgba(255, 0, 85, 0.6)',  // Pink
+            'rgba(0, 234, 255, 0.6)', // Cyan
+            'rgba(0, 255, 85, 0.6)'   // Green
+        ]; 
+        return colors[lane] || 'rgba(255, 255, 255, 0.6)';
     }
 }

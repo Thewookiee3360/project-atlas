@@ -1,101 +1,173 @@
-window.currentPlayer = "Guest"; 
+const menuScreen = document.getElementById('menu-screen');
+const gameContainer = document.getElementById('game-container');
+const songListEl = document.getElementById('song-list');
+const playerBtns = document.querySelectorAll('.player-btn');
+const currentPlayerEl = document.getElementById('player-name');
 
-function selectProfile(name) {
-    window.currentPlayer = name;
-    
-    // Update the visual tag
-    document.getElementById('player-name-display').innerText = name;
-    
-    // Hide the profile screen
-    document.getElementById('profile-screen').style.display = 'none';
-    
-    console.log("Player selected:", window.currentPlayer);
-}
+// Modal Elements
+const modal = document.getElementById('song-modal');
+const closeBtn = document.getElementById('close-modal-btn');
+const groovyBtn = document.getElementById('groovy-btn');
 
-// Allow clicking the "Playing as..." tag to switch profiles again
-document.addEventListener('DOMContentLoaded', () => {
-    const playerTag = document.getElementById('current-player-tag');
-    if(playerTag) {
-        playerTag.addEventListener('click', () => {
-            document.getElementById('profile-screen').style.display = 'flex';
-        });
-    }
+let currentAudioPreview = null;
+let previewTimeout = null;
+let selectedSongData = null;
+
+// --- 1. PLAYER SELECTION (Tap to Select, Tap to Confirm) ---
+let pendingPlayer = null;
+
+// Default player
+window.currentPlayer = "Atlas";
+currentPlayerEl.innerText = "Atlas";
+if(playerBtns[0]) playerBtns[0].classList.add('confirmed');
+
+playerBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const name = btn.getAttribute('data-name');
+
+        if (pendingPlayer === name) {
+            // SECOND TAP: Confirm and Lock In
+            playerBtns.forEach(b => {
+                b.classList.remove('selected');
+                b.classList.remove('confirmed');
+            });
+            btn.classList.add('confirmed'); 
+            
+            currentPlayerEl.innerText = name;
+            window.currentPlayer = name;
+            pendingPlayer = null; 
+            
+            btn.style.transform = "scale(1.1)";
+            setTimeout(() => btn.style.transform = "scale(1)", 200);
+
+        } else {
+            // FIRST TAP: Select (Pending)
+            playerBtns.forEach(b => {
+                b.classList.remove('selected');
+                b.classList.remove('confirmed');
+            });
+            btn.classList.add('selected'); 
+            pendingPlayer = name;
+            
+            currentPlayerEl.innerText = "Tap again to confirm " + name + "?";
+        }
+    });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const songContainer = document.getElementById('song-list-container');
-    const searchInput = document.getElementById('search-input');
-    const menuScreen = document.getElementById('menu-screen');
-    const gameScreen = document.getElementById('game-container');
-    const backBtn = document.getElementById('back-to-menu-btn');
-
-    let allSongs = [];
-
-    // 1. Load the Song List
-    // FIX: Removed the broken 'await fetch' line that was here
-    fetch('assets/data/song_list.json')
-        .then(response => response.json())
-        .then(data => {
-            allSongs = data;
-            renderSongs(allSongs);
-        })
-        .catch(err => console.error("Error loading song list:", err));
-
-    // 2. Render the List
-    function renderSongs(songs) {
-        if (!songContainer) return;
-        songContainer.innerHTML = '';
+// --- 2. LOAD SONG LIST ---
+async function initMenu() {
+    try {
+        // FIX: The path is exactly 'assets' now
+        const response = await fetch('assets/data/song_list.json');
         
+        if (!response.ok) {
+            throw new Error("Could not find the file! Check folder name.");
+        }
+        
+        const songs = await response.json();
+        
+        songListEl.innerHTML = ''; 
+
         songs.forEach(song => {
             const card = document.createElement('div');
-            card.className = 'song-card';
-            
+            card.className = 'song-card'; 
             card.innerHTML = `
-                <div class="song-info">
-                    <div class="song-title">${song.title}</div>
-                    <div class="song-artist">${song.artist}</div>
-                </div>
-                <div class="song-difficulty">${song.difficulty || 'Normal'}</div>
+                <h3>${song.title}</h3>
+                <p>${song.difficulty || 'Normal'}</p>
             `;
             
-            card.onclick = () => {
-                launchGame(song);
-            };
-            songContainer.appendChild(card);
+            // Clicking a grid item opens the preview modal
+            card.onclick = () => openSongPreview(song);
+            songListEl.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error("Menu Load Error:", err);
+        songListEl.innerHTML = `<p style="color:red">Error loading songs. Check console.</p>`;
+    }
+}
+initMenu();
+
+function openSongPreview(song) {
+    selectedSongData = song;
+    
+    document.getElementById('modal-song-title').innerText = song.title;
+    document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
+    document.getElementById('modal-difficulty').innerText = song.difficulty || "Normal";
+
+    // --- LEADERBOARD DISPLAY LOGIC ---
+    const key = 'leaderboard_' + song.id;
+    let history = JSON.parse(localStorage.getItem(key)) || [];
+    
+    // 1. Sort history from Highest Score to Lowest
+    history.sort((a,b) => b.score - a.score); 
+    
+    // 2. Find Personal Best
+    let myBest = 0;
+    history.forEach(entry => {
+        if (entry.name === window.currentPlayer && entry.score > myBest) {
+            myBest = entry.score;
+        }
+    });
+    document.getElementById('modal-personal-best').innerText = myBest;
+
+    // 3. Populate List
+    const lbList = document.getElementById('modal-leaderboard-list');
+    lbList.innerHTML = '';
+    if (history.length === 0) {
+        lbList.innerHTML = '<li><span style="color:cyan;">No scores yet! Be the first!</span></li>';
+    } else {
+        // Show Top 3 Scores
+        history.slice(0, 3).forEach(entry => { 
+            lbList.innerHTML += `<li><span style="color:cyan; font-weight:bold;">${entry.name}</span><span>${entry.score}</span></li>`;
         });
     }
 
-    // 3. Search Functionality
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allSongs.filter(song => 
-            song.title.toLowerCase().includes(term) || 
-            song.artist.toLowerCase().includes(term)
-        );
-        renderSongs(filtered);
+    modal.style.display = 'flex';
+
+    stopPreview(); 
+    
+    const audioUrl = song.video.includes('/') ? song.video : 'assets/video/' + song.video;
+    currentAudioPreview = new Audio(audioUrl);
+    currentAudioPreview.addEventListener('loadedmetadata', () => {
+        currentAudioPreview.currentTime = currentAudioPreview.duration * 0.4;
+        currentAudioPreview.play().then(() => {
+            previewTimeout = setTimeout(() => {
+                if (currentAudioPreview) currentAudioPreview.pause();
+            }, 10000); 
+        }).catch(e => console.log("Preview autoplay blocked by browser", e));
     });
+}
 
-    // 4. Launch Game Logic
-    function launchGame(songData) {
-        // Hide Menu, Show Game
-        menuScreen.style.display = 'none';
-        gameScreen.style.display = 'block';
-
-        if (window.gameInstance) {
-            // Force the game to calculate its size now that it is visible
-            window.gameInstance.resize(); 
-            window.gameInstance.loadLevel(songData);
-        } else {
-            console.error("Game instance not found!");
-        }
+function stopPreview() {
+    if (currentAudioPreview) {
+        currentAudioPreview.pause();
+        currentAudioPreview = null;
     }
+    if (previewTimeout) {
+        clearTimeout(previewTimeout);
+        previewTimeout = null;
+    }
+}
 
-    // 5. Back Button Logic
-    backBtn.addEventListener('click', () => {
-        if (window.gameInstance) {
-            window.gameInstance.stopGame();
-        }
-        gameScreen.style.display = 'none';
-        menuScreen.style.display = 'flex';
-    });
+// --- 4. MODAL BUTTONS ---
+closeBtn.onclick = () => {
+    stopPreview();
+    modal.style.display = 'none';
+};
+
+groovyBtn.onclick = () => {
+    stopPreview(); 
+    modal.style.display = 'none';
+    menuScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+    
+    if (window.gameInstance && selectedSongData) {
+        window.gameInstance.loadLevel(selectedSongData);
+    }
+};
+
+document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+    gameContainer.style.display = 'none';
+    menuScreen.style.display = 'flex';
 });

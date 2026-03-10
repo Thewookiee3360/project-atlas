@@ -5,143 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atlas Rhythm</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00eaff">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="icon.png">
-
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
     <div id="menu-screen">
-        <div class="app-header">
-            <h1>ATLAS RHYTHM</h1>
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Search songs...">
-            </div>
-        </div>
-
-        <div id="song-list-container">
-            </div>
-    </div>
-
-    <div id="profile-screen">
-        <div class="profile-container">
-            <h1>WHO IS PLAYING?</h1>
-            <div class="profile-list">
-                <button class="profile-btn" onclick="selectProfile('Atlas')">
-                    <div class="avatar" style="background: #00eaff;">A</div>
-                    <span>ATLAS</span>
-                </button>
-                <button class="profile-btn" onclick="selectProfile('Dad')">
-                    <div class="avatar" style="background: #ffd700;">D</div>
-                    <span>DAD</span>
-                </button>
-                <button class="profile-btn" onclick="selectProfile('Travis')">
-                    <div class="avatar" style="background: #ff0099;">T</div>
-                    <span>TRAVIS</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="current-player-tag">Playing as: <span id="player-name-display">...</span></div>
-
-    <div id="game-container" style="display: none;">
-        <button id="back-to-menu-btn"><i class="fas fa-arrow-left"></i></button>
-
-        <video id="bg-video" playsinline webkit-playsinline></video>
+        <h1 class="logo-text">ATLAS RHYTHM</h1>
         
-        <div id="track-overlay">
-            <div class="lane"></div>
-            <div class="lane"></div>
-            <div class="lane"></div>
+        <div id="player-select-container">
+            <h3>WHO IS PLAYING?</h3>
+            <div id="player-buttons">
+                <button class="player-btn" data-name="Atlas">ATLAS</button>
+                <button class="player-btn" data-name="Dad">DAD</button>
+                <button class="player-btn" data-name="Travis">TRAVIS</button>
+                <button class="player-btn" data-name="Aiden">AIDEN</button>
+            </div>
+            <p id="current-player-display">Playing as: <span id="player-name">...</span></p>
         </div>
+        
+        <div id="song-list"></div>
 
+        <div id="trademark">© ATLAS GAMES EST. 2025 | PATENT PENDING</div>
+    </div>
+
+    <div id="song-modal" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn">⬅ BACK</button>
+            
+            <h2 id="modal-song-title">Song Title</h2>
+            <p id="modal-song-artist">Artist</p>
+            
+            <div class="modal-stats">
+                <div class="stat-box">
+                    <p class="stat-label">DIFFICULTY</p>
+                    <p id="modal-difficulty" class="stat-val">Normal</p>
+                </div>
+                <div class="stat-box">
+                    <p class="stat-label">YOUR BEST</p>
+                    <p id="modal-personal-best" class="stat-val">0</p>
+                </div>
+            </div>
+
+            <div class="modal-leaderboard">
+                <h3>TOP SCORES</h3>
+                <ul id="modal-leaderboard-list"></ul>
+            </div>
+
+            <button id="groovy-btn">START SONG</button>
+        </div>
+    </div>
+
+    <div id="game-container" style="display:none;">
+        
+        <button id="back-to-menu-btn" class="game-back-btn">⬅ MENU</button>
+        
+        <video id="bg-video" playsinline webkit-playsinline></video>
         <canvas id="game-canvas"></canvas>
-
+        
         <div id="ui-layer">
             <div id="score">Score: 0</div>
-            
-            <div id="combo-hud" style="opacity: 0;">
-                <span id="combo-count">0</span>x
+            <div id="combo-hud">
+                <div id="combo-count">0</div>
                 <div id="combo-label">COMBO</div>
             </div>
-            <div id="multiplier-hud" style="opacity: 0;">
-                Multiplier: x<span id="multiplier-val">1</span>
-            </div>
-
-            <button id="start-btn">TAP TO START</button>
-            <button id="export-btn" style="display:none; position:absolute; bottom:20px; right:20px;">EXPORT JSON</button>
-        </div>
-        
-        <audio id="cheer-sfx" src="assets/audio/cheer.mp3" preload="auto"></audio>
-
-        <div id="results-screen" style="display: none;">
-            <div class="results-container">
-                <div class="results-header">
-                    <h1>AWESOME!</h1>
-                </div>
-
-                <div class="score-bubble">
-                    <div class="label">SCORE</div>
-                    <div id="final-score-val" class="big-number">0</div>
-                </div>
-
-                <div class="highscore-bubble">
-                    <div class="icon">👑</div>
-                    <div class="text">
-                        <div class="label">MAX COMBO</div>
-                        <div id="final-combo-val">0</div>
-                    </div>
-                </div>
-                
-                <div class="leaderboard-box">
-                    <h3>TOP SCORERS</h3>
-                    <ul id="leaderboard-list">
-                        </ul>
-                </div>
-                
-                <div class="results-buttons">
-                    <button id="replay-btn" class="btn-primary">
-                        <i class="fas fa-redo"></i> REPLAY
-                    </button>
-                    <button id="menu-btn" class="btn-secondary">
-                        <i class="fas fa-home"></i> MENU
-                    </button>
-                </div>
-            </div>
+            <div id="multiplier-hud"><span id="multiplier-val">x1</span></div>
         </div>
 
+        <div id="start-btn">TAP TO START</div>
+
+        <div id="results-screen">
+            <h2>SONG COMPLETE!</h2>
+            <div class="result-box">
+                <p>Score: <span id="final-score-val">0</span></p>
+                <p>Max Combo: <span id="final-combo-val">0</span></p>
+            </div>
+            <div class="result-buttons">
+                <button id="replay-btn">PLAY AGAIN</button>
+                <button id="menu-btn">MENU</button>
+            </div>
+        </div>
     </div>
 
-    <script src="js/input.js"></script>
     <script src="js/note-manager.js"></script>
-    <script src="js/particles.js"></script>
     <script src="js/game.js"></script>
-    
-    <script>
-        function selectProfile(name) {
-            window.currentPlayer = name;
-            document.getElementById('player-name-display').innerText = name;
-            document.getElementById('profile-screen').style.display = 'none';
-        }
-    </script>
-    
-    <script src="js/menu.js"></script> 
-
-    <script>
-    // Register the Service Worker for Offline Play
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('SW Registration Failed', err));
-        });
-    }
-</script>
-</body>
-
+    <script src="js/menu.js"></script>
 </body>
 </html>

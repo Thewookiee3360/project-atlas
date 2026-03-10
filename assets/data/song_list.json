@@ -63,14 +63,7 @@
     "data": "assets/data/close_eyes.json",
     "difficulty": "Hard"
   },
-  {
-    "id": "murder-in-my-mind",
-    "title": "Murder In My Mind",
-    "artist": "Kordhell",
-    "video": "assets/video/murder_in_my_mind.mp4",
-    "data": "assets/data/murder_in_my_mind.json",
-    "difficulty": "Expert"
-  },
+  
   {
     "id": "rush-e",
     "title": "Rush E",
