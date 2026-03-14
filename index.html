@@ -44,9 +44,13 @@
     </div>
 
     <div id="song-modal" style="display: none;">
+        <div id="modal-bg-blur"></div>
+        
         <div class="modal-content">
             <button id="close-modal-btn">⬅ BACK</button>
             
+            <img id="modal-cover-img" src="" alt="Album Cover" style="display:none; width: 150px; height: 150px; border-radius: 12px; margin: 0 auto 15px auto; border: 2px solid #ffd700; object-fit: cover; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
+
             <h2 id="modal-song-title">Song Title</h2>
             <p id="modal-song-artist">Artist</p>
             
@@ -89,6 +93,9 @@
         <div id="start-btn">TAP TO START</div>
         <div id="results-screen">
             <h2>SONG COMPLETE!</h2>
+            
+            <div id="final-grade-display" style="font-size: 90px; font-weight: bold; font-family: 'Rajdhani'; margin: 5px 0; text-shadow: 0 0 30px #ffd700;">S</div>
+            
             <div class="result-box">
                 <p>Score: <span id="final-score-val">0</span></p>
                 <p>Max Combo: <span id="final-combo-val">0</span></p>

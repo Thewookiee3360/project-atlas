@@ -171,4 +171,26 @@ html, body {
     border-radius: 8px; font-family: 'Rajdhani'; font-size: 16px; cursor: pointer;
     transition: all 0.2s;
 }
-.sidebar-item:hover { background: rgba(255, 51, 51, 0.2); border-color: #ffd700; }
+.sidebar-item:hover { background: rgba(255, 51, 51, 0.2); border-color: #ffd700; }  
+#song-modal {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    /* We remove the dark background here because the blur layer will handle it */
+    z-index: 200; display: none; align-items: center; justify-content: center;
+}
+
+/* NEW: The cinematic blurry background */
+#modal-bg-blur {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    filter: blur(15px) brightness(0.3); /* Blurs it and makes it dark */
+    z-index: 1; /* Puts it behind the modal content */
+}
+
+/* Update modal-content to sit on top of the blur */
+.modal-content {
+    background: rgba(17, 17, 17, 0.85); /* Slightly transparent to see the blur */
+    border: 2px solid #ffd700; border-radius: 15px;
+    width: 85%; max-width: 400px; padding: 25px; text-align: center;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); position: relative; color: white;
+    z-index: 2; /* Sits above the blur */
+}

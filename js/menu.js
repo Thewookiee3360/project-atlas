@@ -91,6 +91,21 @@ initMenu();
 
 function openSongPreview(song) {
     selectedSongData = song;
+
+    const modalBg = document.getElementById('modal-bg-blur');
+    const modalCover = document.getElementById('modal-cover-img');
+    
+    if (song.cover) {
+        modalBg.style.backgroundImage = `url('${song.cover}')`;
+        modalCover.src = song.cover;
+        modalCover.style.display = "block";
+    } else {
+        modalBg.style.backgroundImage = "none";
+        modalBg.style.backgroundColor = "rgba(0,0,0,0.85)";
+        modalCover.style.display = "none";
+    }
+    
+    document.getElementById('modal-song-title').innerText = song.title;
     
     document.getElementById('modal-song-title').innerText = song.title;
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";

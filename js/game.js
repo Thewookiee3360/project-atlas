@@ -198,6 +198,13 @@ class Game {
     }
 
     registerHit(lane, points, accuracyText) {
+
+        if (accuracyText === "PERFECT") this.stats.perfect++;
+        else if (accuracyText === "GREAT") this.stats.great++;
+        else if (accuracyText === "GOOD") this.stats.good++;
+
+        this.combo++;
+
         this.combo++;
         if(this.combo > this.maxCombo) this.maxCombo = this.combo;
         
@@ -229,6 +236,7 @@ class Game {
         this.updateHUD();
         this.spawnFloatingText(lane, "MISS", "#ff3333"); // Red Miss
         if (navigator.vibrate) navigator.vibrate(100);
+        this.stats.miss++; // NEW: Track the miss for the grade!
     }
     
     // Now requires 'lane' parameter so it knows where to draw the MISS text
@@ -242,6 +250,7 @@ class Game {
         this.spawnFloatingText(targetLane, "MISS", "#ff3333"); // Red Miss
         
         if (navigator.vibrate) navigator.vibrate(100);
+        this.stats.miss++; // NEW: Track the miss for the grade!
     }
 
     spawnParticles(lane) {
@@ -302,6 +311,12 @@ class Game {
         this.updateHUD();
         this.resultsScreen.style.display = 'none';
         this.startBtn.style.display = 'block';
+
+        // Reset everything, including the stats array
+        this.score = 0; this.combo = 0; this.multiplier = 1; 
+        this.particles = []; this.floatingTexts = [];
+        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // NEW!
+        this.updateHUD();
     }
 
     startGame() {
@@ -357,8 +372,6 @@ class Game {
     finishGame() {
         this.isPlaying = false;
         
-        // --- NEW: PLAY THE CHEER AUDIO ---
-        // Assumes your file is in an audio folder! Adjust path if needed.
         const cheerAudio = new Audio('assets/audio/cheer.mp3'); 
         cheerAudio.play().catch(e => console.log("Cheer blocked by browser", e));
 
@@ -367,12 +380,32 @@ class Game {
         
         let hist = JSON.parse(localStorage.getItem(key)) || [];
         hist.push({ name: playerName, score: this.score, combo: this.maxCombo });
-       
         hist.sort((a,b) => b.score - a.score);
         localStorage.setItem(key, JSON.stringify(hist.slice(0, 5))); 
         
         document.getElementById('final-score-val').innerText = this.score;
         document.getElementById('final-combo-val').innerText = this.maxCombo;
+        
+        // --- NEW: S-RANK CALCULATOR ---
+        const totalNotes = this.stats.perfect + this.stats.great + this.stats.good + this.stats.miss;
+        let percent = 0;
+        if (totalNotes > 0) {
+            // Perfect is 100%, Great is 80%, Good is 50%, Miss is 0%
+            percent = ((this.stats.perfect * 100) + (this.stats.great * 80) + (this.stats.good * 50)) / totalNotes;
+        }
+
+        let grade = "F"; let color = "#ff3333"; // Red F
+        if (percent >= 95) { grade = "S"; color = "#ffd700"; }      // Gold S
+        else if (percent >= 85) { grade = "A"; color = "#00FF55"; } // Green A
+        else if (percent >= 75) { grade = "B"; color = "#00eaff"; } // Cyan B
+        else if (percent >= 60) { grade = "C"; color = "#ff8c00"; } // Orange C
+        else if (percent >= 50) { grade = "D"; color = "#aaaaaa"; } // Grey D
+
+        const gradeDisplay = document.getElementById('final-grade-display');
+        gradeDisplay.innerText = grade;
+        gradeDisplay.style.color = color;
+        gradeDisplay.style.textShadow = `0 0 30px ${color}`;
+
         this.resultsScreen.style.display = 'flex';
     }
 
