@@ -22,33 +22,39 @@ class Particle {
     }
 }
 
-// --- NEW: FLOATING TEXT SYSTEM ---
+// --- NEW & IMPROVED: FLOATING TEXT SYSTEM ---
 class FloatingText {
     constructor(x, y, text, color) {
         this.x = x;
         this.y = y;
-        this.text = text;
+        this.text = text || "GOOD"; // Failsafe so it never breaks
         this.color = color;
         this.life = 1.0;
         this.speedY = -1.5; // Drift upwards slowly
+        this.scale = 1.6;   // Start 60% larger for an arcade "Pop" effect
     }
     update() {
         this.y += this.speedY;
-        this.life -= 0.03; // Fade out quickly
+        this.life -= 0.03; // Fade out 
+        if (this.scale > 1.0) this.scale -= 0.1; // Shrink rapidly to normal size
     }
     draw(ctx) {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.life);
         ctx.fillStyle = this.color;
-        // Cool arcade font styling
-        ctx.font = "bold 32px 'Rajdhani', sans-serif";
         ctx.textAlign = "center";
         
         // Add a black outline so it's readable over bright video backgrounds
         ctx.strokeStyle = "black";
         ctx.lineWidth = 4;
-        ctx.strokeText(this.text, this.x, this.y);
-        ctx.fillText(this.text, this.x, this.y);
+        
+        // Apply the shrinking Pop effect
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.scale, this.scale);
+        
+        ctx.font = "bold 32px 'Rajdhani', sans-serif";
+        ctx.strokeText(this.text, 0, 0);
+        ctx.fillText(this.text, 0, 0);
         
         ctx.restore();
     }
