@@ -179,3 +179,24 @@ html, body {
     transition: all 0.2s;
 }
 .sidebar-item:hover { background: rgba(255, 51, 51, 0.2); border-color: #ffd700; }
+
+.song-card {
+    background: rgba(20, 20, 35, 0.8); border-radius: 12px; padding: 15px;
+    text-align: center; border: 2px solid transparent; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
+    display: flex; flex-direction: column; justify-content: flex-end; /* Pushes text to the bottom */
+    min-height: 140px; /* Made slightly taller to show off the art */
+    position: relative; overflow: hidden;
+    background-size: cover; background-position: center;
+}
+.song-card:active { transform: scale(0.95); }
+
+/* The dark shadow overlay over the album art */
+.song-card::after { 
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.1) 80%);
+    z-index: 1; pointer-events: none;
+}
+
+.song-card h3 { margin: 0; font-size: 18px; color: white; position: relative; z-index: 2; text-shadow: 0 2px 4px black;}
+.song-card p { margin: 5px 0 0 0; font-size: 14px; color: #ff3333; position: relative; z-index: 2; text-shadow: 0 2px 4px black; font-weight: bold;}

@@ -66,6 +66,11 @@ async function initMenu() {
             const card = document.createElement('div');
             card.className = 'song-card'; 
             
+            // --- NEW: Apply the album cover background ---
+            if (song.cover) {
+                card.style.backgroundImage = `url('${song.cover}')`;
+            }
+            
             let diffLabel = song.difficulties ? song.difficulties.join(" / ") : (song.difficulty || 'Normal');
             
             card.innerHTML = `
@@ -76,6 +81,9 @@ async function initMenu() {
             card.onclick = () => openSongPreview(song);
             songListEl.appendChild(card);
         });
+
+        // --- NEW: Jumpstart the rotating leaderboard ---
+        buildRotatingLeaderboard(songs);
 
     } catch (err) {
         console.error("Menu Load Error:", err);
@@ -209,4 +217,60 @@ if (hamburgerBtn && sidebar && closeSidebar) {
     closeSidebar.onclick = () => {
         sidebar.classList.remove('open');
     };
+}
+
+// --- NEW: ROTATING LEADERBOARD TICKER ---
+let rotatingScores = [];
+let currentRotationIndex = 0;
+
+function buildRotatingLeaderboard(songs) {
+    rotatingScores = []; 
+    
+    // Scan every song and difficulty for a #1 score
+    songs.forEach(song => {
+        const diffs = song.difficulties || ["Normal"];
+        diffs.forEach(diff => {
+            const key = 'leaderboard_' + (song.id || "unknown") + "_" + diff;
+            let history = JSON.parse(localStorage.getItem(key)) || [];
+            
+            if (history.length > 0) {
+                history.sort((a,b) => b.score - a.score);
+                const champ = history[0]; // Grab the #1 player
+                rotatingScores.push({
+                    title: song.title,
+                    difficulty: diff,
+                    player: champ.name,
+                    score: champ.score
+                });
+            }
+        });
+    });
+    
+    if (rotatingScores.length > 0) {
+        updateRotationDisplay();
+        setInterval(updateRotationDisplay, 3500); // Cycles every 3.5 seconds
+    }
+}
+
+function updateRotationDisplay() {
+    if (rotatingScores.length === 0) return;
+    const display = document.getElementById('rotating-score');
+    if (!display) return;
+    
+    const data = rotatingScores[currentRotationIndex];
+    
+    // Inject the champion data with a tiny fade effect
+    display.style.opacity = 0;
+    setTimeout(() => {
+        display.innerHTML = `
+            <span style="font-size: 13px; color: #ffd700; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.title} (${data.difficulty})</span>
+            <span style="font-size: 18px; color: white; margin: 2px 0;">🏆 ${data.player}</span>
+            <span style="font-size: 15px; color: #ff3333; font-weight: bold;">${data.score} pts</span>
+        `;
+        display.style.opacity = 1;
+        display.style.transition = "opacity 0.3s ease";
+    }, 300); // Waits 300ms for fade out before changing text
+    
+    currentRotationIndex++;
+    if (currentRotationIndex >= rotatingScores.length) currentRotationIndex = 0;
 }
