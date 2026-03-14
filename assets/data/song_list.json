@@ -71,7 +71,6 @@
     "cover": "assets/images/close_eyes_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
-  
   {
     "id": "rush-e",
     "title": "Rush E",
@@ -118,7 +117,7 @@
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
-    "id": "bbno$ vnlla",
+    "id": "bbno-vnlla",
     "title": "bing bong",
     "artist": "bbno$",
     "video": "assets/video/bingbong.mp4",
@@ -127,23 +126,21 @@
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
-    "id": "nc_rockefeller",
+    "id": "nc-rockefeller",
     "title": "Rockefeller Street",
     "artist": "Nightcore",
-    "video": "rockefeller.mp4",
-    "data": "nightcore_rockefeller.json",
+    "video": "assets/video/rockefeller.mp4",
+    "data": "assets/data/nightcore_rockefeller.json",
     "cover": "assets/images/rockefeller_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
-    "id": "kpop hunters",
+    "id": "kpop-hunters",
     "title": "golden",
     "artist": "huntrix",
     "video": "assets/video/golden.mp4",
     "data": "assets/data/golden.json",
     "cover": "assets/images/golden_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
-    
   }
 ]
-
