@@ -57,6 +57,7 @@ class InputHandler {
         this.lanes = new Array(laneCount).fill(false);
         
         window.addEventListener('keydown', (e) => {
+            if (e.repeat) return; 
             const lane = this.keyMap[e.key.toLowerCase()];
             if (lane !== undefined && lane < this.laneCount && !this.lanes[lane]) {
                 this.lanes[lane] = true; this.onDown(lane);
@@ -92,11 +93,19 @@ class Game {
         this.laneWidth = 0; this.laneFlashes = [0, 0, 0]; 
         
         this.particles = []; this.floatingTexts = []; 
-        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // TRACKS FOR S-RANK
+        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; 
         this.isPlaying = false;
+
+        // --- SILENT BACKGROUND RECORDER ---
+        this.recordedNotes = [];
+        this.pendingHolds = {};
         
         this.noteManager = new NoteManager(this);
-        this.input = new InputHandler(this.laneCount, (lane) => this.handleInputDown(lane), (lane) => {});
+        
+        this.input = new InputHandler(this.laneCount, 
+            (lane) => this.handleInputDown(lane), 
+            (lane) => this.handleInputUp(lane)
+        );
 
         this.init();
     }
@@ -137,7 +146,14 @@ class Game {
         if(e.target === this.canvas) e.preventDefault();
         const rect = this.canvas.getBoundingClientRect();
         
-        if (!isDown && e.touches.length === 0) this.input.lanes.fill(false); 
+        if (!isDown && e.touches.length === 0) {
+            for (let i = 0; i < this.laneCount; i++) {
+                if (this.input.lanes[i]) {
+                    this.input.lanes[i] = false;
+                    this.handleInputUp(i);
+                }
+            }
+        } 
         
         for (let i = 0; i < e.changedTouches.length; i++) {
             const t = e.changedTouches[i];
@@ -146,8 +162,17 @@ class Game {
             if (relativeX >= 0 && relativeX <= rect.width) {
                 const lane = Math.floor(relativeX / this.laneWidth);
                 if (lane >= 0 && lane < this.laneCount) {
-                    this.input.lanes[lane] = isDown; 
-                    if (isDown) this.handleInputDown(lane);
+                    if (isDown) {
+                        if (!this.input.lanes[lane]) {
+                            this.input.lanes[lane] = true;
+                            this.handleInputDown(lane);
+                        }
+                    } else {
+                        if (this.input.lanes[lane]) {
+                            this.input.lanes[lane] = false;
+                            this.handleInputUp(lane);
+                        }
+                    }
                 }
             }
         }
@@ -159,8 +184,17 @@ class Game {
         if (relativeX >= 0 && relativeX <= rect.width) {
             const lane = Math.floor(relativeX / this.laneWidth);
             if (lane >= 0 && lane < this.laneCount) {
-                this.input.lanes[lane] = isDown; 
-                if (isDown) this.handleInputDown(lane);
+                if (isDown) {
+                    if (!this.input.lanes[lane]) {
+                        this.input.lanes[lane] = true;
+                        this.handleInputDown(lane);
+                    }
+                } else {
+                    if (this.input.lanes[lane]) {
+                        this.input.lanes[lane] = false;
+                        this.handleInputUp(lane);
+                    }
+                }
             }
         }
     }
@@ -169,14 +203,38 @@ class Game {
         if(!this.isPlaying) return;
         this.laneFlashes[lane] = 1.0; 
         
+        // --- ALWAYS RECORD THE TAP ---
+        this.pendingHolds[lane] = this.video.currentTime; 
+
+        // Let the game play normally!
         const hitResult = this.noteManager.checkHit(lane, this.video.currentTime);
         if (hitResult) {
             this.registerHit(lane, hitResult.points, hitResult.accuracy);
+        } else {
+            // Still spawn particles so you can see your taps while recording empty lanes
+            this.spawnParticles(lane); 
+        }
+    }
+
+    handleInputUp(lane) {
+        // --- ALWAYS RECORD THE LIFT OFF ---
+        if (this.pendingHolds[lane] !== undefined) {
+            const startTime = this.pendingHolds[lane];
+            const duration = this.video.currentTime - startTime;
+            
+            let note = { time: parseFloat(startTime.toFixed(2)), lane: lane };
+            
+            // Only counts as a hold note if held longer than 0.35 seconds
+            if (duration > 0.35) {
+                note.duration = parseFloat(duration.toFixed(2));
+            }
+            
+            this.recordedNotes.push(note);
+            delete this.pendingHolds[lane];
         }
     }
 
     registerHit(lane, points, accuracyText) {
-        // --- RECORD STATS FOR FINAL GRADE ---
         if (accuracyText === "PERFECT") this.stats.perfect++;
         else if (accuracyText === "GREAT") this.stats.great++;
         else if (accuracyText === "GOOD") this.stats.good++;
@@ -204,14 +262,14 @@ class Game {
     }
 
     handleHoldBreak(lane) {
-        this.stats.miss++; // COUNT MISS
+        this.stats.miss++; 
         this.combo = 0; this.multiplier = 1; this.updateHUD();
         this.spawnFloatingText(lane, "MISS", "#ff3333"); 
         if (navigator.vibrate) navigator.vibrate(100);
     }
     
     handleMiss(lane) {
-        this.stats.miss++; // COUNT MISS
+        this.stats.miss++; 
         this.combo = 0; this.multiplier = 1; this.updateHUD();
         const targetLane = lane !== undefined ? lane : 1;
         this.spawnFloatingText(targetLane, "MISS", "#ff3333"); 
@@ -264,7 +322,12 @@ class Game {
         
         this.score = 0; this.combo = 0; this.multiplier = 1; 
         this.particles = []; this.floatingTexts = [];
-        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // RESET STATS
+        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; 
+        
+        // --- CLEARS PREVIOUS RECORDING ---
+        this.recordedNotes = []; 
+        this.pendingHolds = {};
+        
         this.updateHUD();
         this.resultsScreen.style.display = 'none';
         this.startBtn.style.display = 'block';
@@ -334,7 +397,6 @@ class Game {
         document.getElementById('final-score-val').innerText = this.score;
         document.getElementById('final-combo-val').innerText = this.maxCombo;
 
-        // --- CALCULATE S-RANK ---
         const totalNotes = this.stats.perfect + this.stats.great + this.stats.good + this.stats.miss;
         let percent = 0;
         if (totalNotes > 0) {
