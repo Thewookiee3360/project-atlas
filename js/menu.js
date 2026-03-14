@@ -11,10 +11,9 @@ const groovyBtn = document.getElementById('groovy-btn');
 let currentAudioPreview = null;
 let previewTimeout = null;
 let selectedSongData = null;
-let selectedDifficulty = "Normal"; // Default difficulty
+let selectedDifficulty = "Normal"; 
 let pendingPlayer = null;
 
-// Default player
 window.currentPlayer = "Atlas";
 if(currentPlayerEl) currentPlayerEl.innerText = "Atlas";
 if(playerBtns[0]) playerBtns[0].classList.add('confirmed');
@@ -53,22 +52,20 @@ playerBtns.forEach(btn => {
 async function initMenu() {
     try {
         const response = await fetch('assets/data/song_list.json');
-        
-        if (!response.ok) {
-            throw new Error("Could not find the file! Check folder name.");
-        }
+        if (!response.ok) throw new Error("Could not find the file! Check folder name.");
         
         const songs = await response.json();
-        
         songListEl.innerHTML = ''; 
 
         songs.forEach(song => {
             const card = document.createElement('div');
             card.className = 'song-card'; 
             
-            // --- NEW: Apply the album cover background ---
+            // APPLY ALBUM COVER IMAGE
             if (song.cover) {
                 card.style.backgroundImage = `url('${song.cover}')`;
+                card.style.backgroundSize = 'cover';
+                card.style.backgroundPosition = 'center';
             }
             
             let diffLabel = song.difficulties ? song.difficulties.join(" / ") : (song.difficulty || 'Normal');
@@ -82,7 +79,7 @@ async function initMenu() {
             songListEl.appendChild(card);
         });
 
-        // --- NEW: Jumpstart the rotating leaderboard ---
+        // KICK OFF THE ROTATING TOP 3 LEADERBOARD
         buildRotatingLeaderboard(songs);
 
     } catch (err) {
@@ -98,7 +95,6 @@ function openSongPreview(song) {
     document.getElementById('modal-song-title').innerText = song.title;
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
 
-    // Build Difficulty Buttons
     const diffContainer = document.getElementById('difficulty-selectors');
     diffContainer.innerHTML = '';
     
@@ -219,14 +215,14 @@ if (hamburgerBtn && sidebar && closeSidebar) {
     };
 }
 
-// --- NEW: ROTATING LEADERBOARD TICKER ---
+// --- ROTATING TOP 3 LEADERBOARD ---
 let rotatingScores = [];
 let currentRotationIndex = 0;
 
 function buildRotatingLeaderboard(songs) {
     rotatingScores = []; 
     
-    // Scan every song and difficulty for a #1 score
+    // Scan every song and difficulty for the TOP 3 scores
     songs.forEach(song => {
         const diffs = song.difficulties || ["Normal"];
         diffs.forEach(diff => {
@@ -235,12 +231,12 @@ function buildRotatingLeaderboard(songs) {
             
             if (history.length > 0) {
                 history.sort((a,b) => b.score - a.score);
-                const champ = history[0]; // Grab the #1 player
+                const top3 = history.slice(0, 3); // Grab up to 3 winners!
+                
                 rotatingScores.push({
                     title: song.title,
                     difficulty: diff,
-                    player: champ.name,
-                    score: champ.score
+                    scores: top3
                 });
             }
         });
@@ -248,7 +244,9 @@ function buildRotatingLeaderboard(songs) {
     
     if (rotatingScores.length > 0) {
         updateRotationDisplay();
-        setInterval(updateRotationDisplay, 3500); // Cycles every 3.5 seconds
+        if(!window.rotationInterval) {
+            window.rotationInterval = setInterval(updateRotationDisplay, 4000); // Cycles every 4 seconds
+        }
     }
 }
 
@@ -259,17 +257,37 @@ function updateRotationDisplay() {
     
     const data = rotatingScores[currentRotationIndex];
     
-    // Inject the champion data with a tiny fade effect
+    // Build the HTML for the Top 3 lines
+    let scoresHtml = '';
+    data.scores.forEach((entry, index) => {
+        let prefix = "";
+        let color = "white";
+        
+        // 1st gets Gold + Crown, 2nd gets Silver, 3rd gets Bronze
+        if (index === 0) { prefix = "👑 1."; color = "#ffd700"; }
+        else if (index === 1) { prefix = "🥈 2."; color = "#ccc"; }
+        else if (index === 2) { prefix = "🥉 3."; color = "#cd7f32"; }
+        
+        scoresHtml += `
+            <div style="display: flex; justify-content: space-between; font-size: 15px; color: ${color}; margin: 2px 0;">
+                <span>${prefix} ${entry.name}</span>
+                <span style="font-weight: bold;">${entry.score}</span>
+            </div>
+        `;
+    });
+    
+    // Inject it with a tiny fade effect
     display.style.opacity = 0;
     setTimeout(() => {
         display.innerHTML = `
-            <span style="font-size: 13px; color: #ffd700; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.title} (${data.difficulty})</span>
-            <span style="font-size: 18px; color: white; margin: 2px 0;">🏆 ${data.player}</span>
-            <span style="font-size: 15px; color: #ff3333; font-weight: bold;">${data.score} pts</span>
+            <div style="font-size: 14px; color: #ff3333; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #ff3333; margin-bottom: 5px; padding-bottom: 2px;">
+                ${data.title} <span style="color:#aaa; font-size:12px;">(${data.difficulty})</span>
+            </div>
+            ${scoresHtml}
         `;
         display.style.opacity = 1;
         display.style.transition = "opacity 0.3s ease";
-    }, 300); // Waits 300ms for fade out before changing text
+    }, 300); 
     
     currentRotationIndex++;
     if (currentRotationIndex >= rotatingScores.length) currentRotationIndex = 0;

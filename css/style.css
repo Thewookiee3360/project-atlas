@@ -19,10 +19,8 @@ html, body {
     overflow-y: auto; padding-bottom: 50px;
 }
 
-/* Gold Logo Glow */
 .logo-text { color: white; margin-top: 20px; font-size: 38px; text-shadow: 0 0 15px #ffd700; } 
 
-/* Player Selection */
 #player-select-container {
     text-align: center; color: white; margin-bottom: 20px;
     background: rgba(255, 255, 255, 0.05); padding: 15px;
@@ -37,17 +35,8 @@ html, body {
     transition: all 0.2s ease;
 }
 
-/* 1st Tap (Pending): Red Accent */
-.player-btn.selected { 
-    background: rgba(255, 51, 51, 0.2); 
-    color: white; border-color: #ff3333; box-shadow: 0 0 10px #ff3333;
-}
-
-/* 2nd Tap (Confirmed): Gold Accent */
-.player-btn.confirmed { 
-    background: rgba(255, 215, 0, 0.2); 
-    color: white; border-color: #ffd700; box-shadow: 0 0 15px #ffd700;
-}
+.player-btn.selected { background: rgba(255, 51, 51, 0.2); color: white; border-color: #ff3333; box-shadow: 0 0 10px #ff3333; }
+.player-btn.confirmed { background: rgba(255, 215, 0, 0.2); color: white; border-color: #ffd700; box-shadow: 0 0 15px #ffd700; }
 
 #current-player-display { color: #ffd700; margin-top: 10px; }
 
@@ -57,17 +46,27 @@ html, body {
     width: 95%; max-width: 800px; padding: 10px;
 }
 
+/* --- NEW ALBUM COVER STYLING --- */
 .song-card {
     background: rgba(20, 20, 35, 0.8); border-radius: 12px; padding: 15px;
     text-align: center; border: 2px solid transparent; cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
-    display: flex; flex-direction: column; justify-content: center; min-height: 100px;
+    display: flex; flex-direction: column; justify-content: flex-end; 
+    min-height: 140px; position: relative; overflow: hidden;
+    background-size: cover; background-position: center;
 }
 .song-card:active { transform: scale(0.95); }
-.song-card h3 { margin: 0; font-size: 18px; color: white; }
-.song-card p { margin: 5px 0 0 0; font-size: 14px; color: #ff3333; } /* Red text */
 
-/* --- TRADEMARK FOOTER --- */
+/* Dark shadow overlay over the album art so text is readable */
+.song-card::after { 
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.1) 80%);
+    z-index: 1; pointer-events: none;
+}
+
+.song-card h3 { margin: 0; font-size: 18px; color: white; position: relative; z-index: 2; text-shadow: 0 2px 4px black;}
+.song-card p { margin: 5px 0 0 0; font-size: 14px; color: #ff3333; position: relative; z-index: 2; text-shadow: 0 2px 4px black; font-weight: bold;}
+
 #trademark {
     margin-top: 40px; margin-bottom: 20px; color: rgba(255, 255, 255, 0.4);
     font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
@@ -81,14 +80,12 @@ html, body {
     z-index: 200; display: none; align-items: center; justify-content: center;
 }
 
-/* Gold Border for Modal */
 .modal-content {
     background: #111; border: 2px solid #ffd700; border-radius: 15px;
     width: 85%; max-width: 400px; padding: 25px; text-align: center;
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); position: relative; color: white;
 }
 
-/* Red Back Button */
 #close-modal-btn {
     position: absolute; top: -15px; left: -15px; 
     background: #111; border: 2px solid #ff3333; border-radius: 8px;
@@ -103,14 +100,13 @@ html, body {
 .modal-stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
 .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; width: 45%; }
 .stat-label { margin: 0; font-size: 14px; color: #aaa; }
-.stat-val { margin: 5px 0 0 0; font-size: 20px; color: #ffd700; font-weight: bold; } /* Gold stats */
+.stat-val { margin: 5px 0 0 0; font-size: 20px; color: #ffd700; font-weight: bold; }
 
 .modal-leaderboard { background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; margin-bottom: 20px; text-align: left;}
-.modal-leaderboard h3 { margin: 0 0 10px 0; font-size: 16px; color: #ff3333; text-align: center;} /* Red leaderboard title */
+.modal-leaderboard h3 { margin: 0 0 10px 0; font-size: 16px; color: #ff3333; text-align: center;}
 #modal-leaderboard-list { list-style: none; padding: 0; margin: 0; font-size: 14px;}
 #modal-leaderboard-list li { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
 
-/* Red Start Button */
 #groovy-btn {
     background: linear-gradient(90deg, #cc0000, #ff3333); 
     color: white; border: none; padding: 15px 30px; font-size: 22px;
@@ -128,7 +124,6 @@ html, body {
 #bg-video { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 100%; min-height: 100%; opacity: 0.5; }
 #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
 
-/* Gold Game Exit Button */
 .game-back-btn {
     position: absolute; top: 20px; left: 20px; z-index: 100;
     background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd700; border-radius: 8px;
@@ -136,14 +131,12 @@ html, body {
     font-weight: bold; font-size: 16px; cursor: pointer; pointer-events: auto;
 }
 
-/* --- HUD & UI --- */
 #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 #score { position: absolute; top: 20px; right: 20px; color: white; font-size: 26px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.8);}
 #combo-hud { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; opacity: 0; transition: opacity 0.2s;}
-#combo-count { font-size: 70px; font-weight: 700; text-shadow: 0 0 20px #ffd700; } /* Gold combo */
-#multiplier-hud { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 35px; font-weight: 700; color: #ff3333; opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 15px rgba(255, 51, 51, 0.8);} /* Red multiplier */
+#combo-count { font-size: 70px; font-weight: 700; text-shadow: 0 0 20px #ffd700; } 
+#multiplier-hud { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 35px; font-weight: 700; color: #ff3333; opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 15px rgba(255, 51, 51, 0.8);}
 
-/* Gold Start Tap */
 #start-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; padding: 20px 60px; font-size: 28px; font-family: 'Rajdhani'; font-weight: 700; color: white; background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; border-radius: 50px; pointer-events: auto; cursor: pointer; }
 #results-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,10,0.95); z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .result-box { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 24px; margin-bottom: 30px; }
@@ -179,24 +172,3 @@ html, body {
     transition: all 0.2s;
 }
 .sidebar-item:hover { background: rgba(255, 51, 51, 0.2); border-color: #ffd700; }
-
-.song-card {
-    background: rgba(20, 20, 35, 0.8); border-radius: 12px; padding: 15px;
-    text-align: center; border: 2px solid transparent; cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
-    display: flex; flex-direction: column; justify-content: flex-end; /* Pushes text to the bottom */
-    min-height: 140px; /* Made slightly taller to show off the art */
-    position: relative; overflow: hidden;
-    background-size: cover; background-position: center;
-}
-.song-card:active { transform: scale(0.95); }
-
-/* The dark shadow overlay over the album art */
-.song-card::after { 
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.1) 80%);
-    z-index: 1; pointer-events: none;
-}
-
-.song-card h3 { margin: 0; font-size: 18px; color: white; position: relative; z-index: 2; text-shadow: 0 2px 4px black;}
-.song-card p { margin: 5px 0 0 0; font-size: 14px; color: #ff3333; position: relative; z-index: 2; text-shadow: 0 2px 4px black; font-weight: bold;}
