@@ -19,7 +19,8 @@ html, body {
     overflow-y: auto; padding-bottom: 50px;
 }
 
-.logo-text { color: white; margin-top: 20px; font-size: 38px; text-shadow: 0 0 15px cyan; }
+/* Gold Logo Glow */
+.logo-text { color: white; margin-top: 20px; font-size: 38px; text-shadow: 0 0 15px #ffd700; } 
 
 /* Player Selection */
 #player-select-container {
@@ -36,19 +37,19 @@ html, body {
     transition: all 0.2s ease;
 }
 
-/* 1st Tap: Pending / Selected */
+/* 1st Tap (Pending): Red Accent */
 .player-btn.selected { 
-    background: rgba(255, 165, 0, 0.2); 
-    color: white; border-color: orange; box-shadow: 0 0 10px orange;
+    background: rgba(255, 51, 51, 0.2); 
+    color: white; border-color: #ff3333; box-shadow: 0 0 10px #ff3333;
 }
 
-/* 2nd Tap: Confirmed / Locked In */
+/* 2nd Tap (Confirmed): Gold Accent */
 .player-btn.confirmed { 
-    background: rgba(0, 255, 255, 0.2); 
-    color: white; border-color: cyan; box-shadow: 0 0 15px cyan;
+    background: rgba(255, 215, 0, 0.2); 
+    color: white; border-color: #ffd700; box-shadow: 0 0 15px #ffd700;
 }
 
-#current-player-display { color: cyan; margin-top: 10px; }
+#current-player-display { color: #ffd700; margin-top: 10px; }
 
 /* --- THE 3-COLUMN GRID --- */
 #song-list {
@@ -64,18 +65,13 @@ html, body {
 }
 .song-card:active { transform: scale(0.95); }
 .song-card h3 { margin: 0; font-size: 18px; color: white; }
-.song-card p { margin: 5px 0 0 0; font-size: 14px; color: cyan; }
+.song-card p { margin: 5px 0 0 0; font-size: 14px; color: #ff3333; } /* Red text */
 
 /* --- TRADEMARK FOOTER --- */
 #trademark {
-    margin-top: 40px;
-    margin-bottom: 20px;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 14px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-    text-align: center;
+    margin-top: 40px; margin-bottom: 20px; color: rgba(255, 255, 255, 0.4);
+    font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.2); text-align: center;
 }
 
 /* --- SONG DETAILS MODAL --- */
@@ -85,19 +81,20 @@ html, body {
     z-index: 200; display: none; align-items: center; justify-content: center;
 }
 
+/* Gold Border for Modal */
 .modal-content {
-    background: #111; border: 2px solid cyan; border-radius: 15px;
+    background: #111; border: 2px solid #ffd700; border-radius: 15px;
     width: 85%; max-width: 400px; padding: 25px; text-align: center;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); position: relative; color: white;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); position: relative; color: white;
 }
 
-/* The NEW Modal Back Button (Top Left) */
+/* Red Back Button */
 #close-modal-btn {
     position: absolute; top: -15px; left: -15px; 
-    background: #111; border: 2px solid #ff0055; border-radius: 8px;
+    background: #111; border: 2px solid #ff3333; border-radius: 8px;
     color: white; padding: 10px 15px; font-family: 'Rajdhani', sans-serif; 
     font-weight: bold; font-size: 16px; cursor: pointer;
-    box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
 }
 
 #modal-song-title { font-size: 28px; margin: 0 0 5px 0; color: white; }
@@ -106,23 +103,23 @@ html, body {
 .modal-stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
 .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; width: 45%; }
 .stat-label { margin: 0; font-size: 14px; color: #aaa; }
-.stat-val { margin: 5px 0 0 0; font-size: 20px; color: cyan; font-weight: bold; }
+.stat-val { margin: 5px 0 0 0; font-size: 20px; color: #ffd700; font-weight: bold; } /* Gold stats */
 
 .modal-leaderboard { background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; margin-bottom: 20px; text-align: left;}
-.modal-leaderboard h3 { margin: 0 0 10px 0; font-size: 16px; color: #ff0055; text-align: center;}
+.modal-leaderboard h3 { margin: 0 0 10px 0; font-size: 16px; color: #ff3333; text-align: center;} /* Red leaderboard title */
 #modal-leaderboard-list { list-style: none; padding: 0; margin: 0; font-size: 14px;}
 #modal-leaderboard-list li { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0; }
 
-/* The NEW Start Button */
+/* Red Start Button */
 #groovy-btn {
-    background: linear-gradient(90deg, #00eaff, #0088ff); 
+    background: linear-gradient(90deg, #cc0000, #ff3333); 
     color: white; border: none; padding: 15px 30px; font-size: 22px;
     font-family: 'Rajdhani', sans-serif; font-weight: bold; border-radius: 30px;
-    cursor: pointer; width: 100%; box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    cursor: pointer; width: 100%; box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
     margin-top: 10px;
 }
 
-/* --- GAME SCREENS (Centered & Fixed Width) --- */
+/* --- GAME SCREENS --- */
 #game-container { 
     position: absolute; top: 0; left: 50%; transform: translateX(-50%); 
     width: 100%; max-width: 600px; height: 100%; 
@@ -131,22 +128,23 @@ html, body {
 #bg-video { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 100%; min-height: 100%; opacity: 0.5; }
 #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
 
-/* The NEW In-Game Exit Button */
+/* Gold Game Exit Button */
 .game-back-btn {
     position: absolute; top: 20px; left: 20px; z-index: 100;
-    background: rgba(0, 0, 0, 0.7); border: 2px solid cyan; border-radius: 8px;
+    background: rgba(0, 0, 0, 0.7); border: 2px solid #ffd700; border-radius: 8px;
     color: white; padding: 10px 20px; font-family: 'Rajdhani', sans-serif; 
     font-weight: bold; font-size: 16px; cursor: pointer; pointer-events: auto;
 }
 
-/* --- HUD & UI (Score top right) --- */
+/* --- HUD & UI --- */
 #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 #score { position: absolute; top: 20px; right: 20px; color: white; font-size: 26px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.8);}
 #combo-hud { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; opacity: 0; transition: opacity 0.2s;}
-#combo-count { font-size: 70px; font-weight: 700; text-shadow: 0 0 20px cyan; }
-#multiplier-hud { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 35px; font-weight: 700; color: #ff0055; opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 15px rgba(255, 0, 85, 0.8);}
+#combo-count { font-size: 70px; font-weight: 700; text-shadow: 0 0 20px #ffd700; } /* Gold combo */
+#multiplier-hud { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 35px; font-weight: 700; color: #ff3333; opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 15px rgba(255, 51, 51, 0.8);} /* Red multiplier */
 
-#start-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; padding: 20px 60px; font-size: 28px; font-family: 'Rajdhani'; font-weight: 700; color: white; background: rgba(0, 200, 255, 0.2); border: 2px solid cyan; border-radius: 50px; pointer-events: auto; cursor: pointer; }
+/* Gold Start Tap */
+#start-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; padding: 20px 60px; font-size: 28px; font-family: 'Rajdhani'; font-weight: 700; color: white; background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; border-radius: 50px; pointer-events: auto; cursor: pointer; }
 #results-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,10,0.95); z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .result-box { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 24px; margin-bottom: 30px; }
-.result-buttons button { padding: 15px 40px; margin: 10px; font-size: 22px; font-family: 'Rajdhani'; background: transparent; color: white; border: 2px solid #ff0055; border-radius: 8px; cursor: pointer;}
+.result-buttons button { padding: 15px 40px; margin: 10px; font-size: 22px; font-family: 'Rajdhani'; background: transparent; color: white; border: 2px solid #ffd700; border-radius: 8px; cursor: pointer;}

@@ -164,12 +164,12 @@ class NoteManager {
     }
 
     getNoteColor(lane) {
-        // CHANGED to RGBA for 60% opacity (semi-transparent)
+        // Red, Gold, and Dark Orange for a warm/fiery aesthetic
         const colors = [
-            'rgba(255, 0, 85, 0.6)',  // Pink
-            'rgba(0, 234, 255, 0.6)', // Cyan
-            'rgba(0, 255, 85, 0.6)'   // Green
+            'rgba(255, 51, 51, 0.6)',   // Lane 0: Red
+            'rgba(255, 215, 0, 0.6)',   // Lane 1: Gold
+            'rgba(255, 140, 0, 0.6)'    // Lane 2: Orange
         ]; 
-        return colors[lane] || 'rgba(255, 255, 255, 0.6)';
+        return colors[lane] || 'rgba(255, 215, 0, 0.6)';
     }
 }

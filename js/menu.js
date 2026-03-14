@@ -95,14 +95,11 @@ function openSongPreview(song) {
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
     document.getElementById('modal-difficulty').innerText = song.difficulty || "Normal";
 
-    // --- LEADERBOARD DISPLAY LOGIC ---
     const key = 'leaderboard_' + song.id;
     let history = JSON.parse(localStorage.getItem(key)) || [];
     
-    // 1. Sort history from Highest Score to Lowest
     history.sort((a,b) => b.score - a.score); 
     
-    // 2. Find Personal Best
     let myBest = 0;
     history.forEach(entry => {
         if (entry.name === window.currentPlayer && entry.score > myBest) {
@@ -111,15 +108,13 @@ function openSongPreview(song) {
     });
     document.getElementById('modal-personal-best').innerText = myBest;
 
-    // 3. Populate List
     const lbList = document.getElementById('modal-leaderboard-list');
     lbList.innerHTML = '';
     if (history.length === 0) {
-        lbList.innerHTML = '<li><span style="color:cyan;">No scores yet! Be the first!</span></li>';
+        lbList.innerHTML = '<li><span style="color:#ffd700;">No scores yet! Be the first!</span></li>'; // Gold text
     } else {
-        // Show Top 3 Scores
         history.slice(0, 3).forEach(entry => { 
-            lbList.innerHTML += `<li><span style="color:cyan; font-weight:bold;">${entry.name}</span><span>${entry.score}</span></li>`;
+            lbList.innerHTML += `<li><span style="color:#ffd700; font-weight:bold;">${entry.name}</span><span>${entry.score}</span></li>`; // Gold names
         });
     }
 

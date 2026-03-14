@@ -264,13 +264,13 @@ class Game {
             this.ctx.strokeRect(i*this.laneWidth, 0, this.laneWidth, this.canvas.height);
         }
 
-        // Draw Hit Targets
+        // Draw Gold Hit Targets
         const hitY = this.canvas.height * 0.85; 
         const targetHeight = 60;
         
         for(let i=0; i<3; i++) {
             const opacity = 0.2 + (this.laneFlashes[i] * 0.8); 
-            this.ctx.strokeStyle = `rgba(0, 255, 255, ${opacity})`;
+            this.ctx.strokeStyle = `rgba(255, 215, 0, ${opacity})`; // Glowing Gold!
             this.ctx.lineWidth = 4 + (this.laneFlashes[i] * 4);
             const w = this.laneWidth * 0.8;
             const x = (i * this.laneWidth) + (this.laneWidth * 0.1);
@@ -281,7 +281,6 @@ class Game {
         this.noteManager.update(this.video.currentTime);
         this.noteManager.draw(this.ctx);
         
-        // Draw Particles
         this.particles.forEach(p => { p.update(); p.draw(this.ctx); });
         this.particles = this.particles.filter(p => p.life > 0);
         
