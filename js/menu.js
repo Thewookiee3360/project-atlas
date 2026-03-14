@@ -61,7 +61,6 @@ async function initMenu() {
             const card = document.createElement('div');
             card.className = 'song-card'; 
             
-            // APPLY ALBUM COVER IMAGE
             if (song.cover) {
                 card.style.backgroundImage = `url('${song.cover}')`;
                 card.style.backgroundSize = 'cover';
@@ -79,7 +78,6 @@ async function initMenu() {
             songListEl.appendChild(card);
         });
 
-        // KICK OFF THE ROTATING TOP 3 LEADERBOARD
         buildRotatingLeaderboard(songs);
 
     } catch (err) {
@@ -91,21 +89,22 @@ initMenu();
 
 function openSongPreview(song) {
     selectedSongData = song;
-
+    
+    // --- LOAD THE ALBUM COVER & BLUR ---
     const modalBg = document.getElementById('modal-bg-blur');
     const modalCover = document.getElementById('modal-cover-img');
     
-    if (song.cover) {
-        modalBg.style.backgroundImage = `url('${song.cover}')`;
-        modalCover.src = song.cover;
-        modalCover.style.display = "block";
-    } else {
-        modalBg.style.backgroundImage = "none";
-        modalBg.style.backgroundColor = "rgba(0,0,0,0.85)";
-        modalCover.style.display = "none";
+    if (modalBg && modalCover) {
+        if (song.cover) {
+            modalBg.style.backgroundImage = `url('${song.cover}')`;
+            modalCover.src = song.cover;
+            modalCover.style.display = "block";
+        } else {
+            modalBg.style.backgroundImage = "none";
+            modalBg.style.backgroundColor = "rgba(0,0,0,0.85)";
+            modalCover.style.display = "none";
+        }
     }
-    
-    document.getElementById('modal-song-title').innerText = song.title;
     
     document.getElementById('modal-song-title').innerText = song.title;
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
@@ -222,12 +221,8 @@ const sidebar = document.getElementById('sidebar');
 const closeSidebar = document.getElementById('close-sidebar');
 
 if (hamburgerBtn && sidebar && closeSidebar) {
-    hamburgerBtn.onclick = () => {
-        sidebar.classList.add('open');
-    };
-    closeSidebar.onclick = () => {
-        sidebar.classList.remove('open');
-    };
+    hamburgerBtn.onclick = () => { sidebar.classList.add('open'); };
+    closeSidebar.onclick = () => { sidebar.classList.remove('open'); };
 }
 
 // --- ROTATING TOP 3 LEADERBOARD ---
@@ -236,23 +231,15 @@ let currentRotationIndex = 0;
 
 function buildRotatingLeaderboard(songs) {
     rotatingScores = []; 
-    
-    // Scan every song and difficulty for the TOP 3 scores
     songs.forEach(song => {
         const diffs = song.difficulties || ["Normal"];
         diffs.forEach(diff => {
             const key = 'leaderboard_' + (song.id || "unknown") + "_" + diff;
             let history = JSON.parse(localStorage.getItem(key)) || [];
-            
             if (history.length > 0) {
                 history.sort((a,b) => b.score - a.score);
-                const top3 = history.slice(0, 3); // Grab up to 3 winners!
-                
-                rotatingScores.push({
-                    title: song.title,
-                    difficulty: diff,
-                    scores: top3
-                });
+                const top3 = history.slice(0, 3);
+                rotatingScores.push({ title: song.title, difficulty: diff, scores: top3 });
             }
         });
     });
@@ -260,7 +247,7 @@ function buildRotatingLeaderboard(songs) {
     if (rotatingScores.length > 0) {
         updateRotationDisplay();
         if(!window.rotationInterval) {
-            window.rotationInterval = setInterval(updateRotationDisplay, 4000); // Cycles every 4 seconds
+            window.rotationInterval = setInterval(updateRotationDisplay, 4000); 
         }
     }
 }
@@ -271,14 +258,9 @@ function updateRotationDisplay() {
     if (!display) return;
     
     const data = rotatingScores[currentRotationIndex];
-    
-    // Build the HTML for the Top 3 lines
     let scoresHtml = '';
     data.scores.forEach((entry, index) => {
-        let prefix = "";
-        let color = "white";
-        
-        // 1st gets Gold + Crown, 2nd gets Silver, 3rd gets Bronze
+        let prefix = ""; let color = "white";
         if (index === 0) { prefix = "👑 1."; color = "#ffd700"; }
         else if (index === 1) { prefix = "🥈 2."; color = "#ccc"; }
         else if (index === 2) { prefix = "🥉 3."; color = "#cd7f32"; }
@@ -291,7 +273,6 @@ function updateRotationDisplay() {
         `;
     });
     
-    // Inject it with a tiny fade effect
     display.style.opacity = 0;
     setTimeout(() => {
         display.innerHTML = `

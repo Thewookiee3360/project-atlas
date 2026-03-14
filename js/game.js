@@ -22,40 +22,26 @@ class Particle {
     }
 }
 
-// --- NEW & IMPROVED: FLOATING TEXT SYSTEM ---
+// --- FLOATING TEXT SYSTEM ---
 class FloatingText {
     constructor(x, y, text, color) {
-        this.x = x;
-        this.y = y;
-        this.text = text || "GOOD"; // Failsafe so it never breaks
-        this.color = color;
-        this.life = 1.0;
-        this.speedY = -1.5; // Drift upwards slowly
-        this.scale = 1.6;   // Start 60% larger for an arcade "Pop" effect
+        this.x = x; this.y = y; this.text = text || "GOOD"; 
+        this.color = color; this.life = 1.0; this.speedY = -1.5; 
+        this.scale = 1.6;   
     }
     update() {
-        this.y += this.speedY;
-        this.life -= 0.03; // Fade out 
-        if (this.scale > 1.0) this.scale -= 0.1; // Shrink rapidly to normal size
+        this.y += this.speedY; this.life -= 0.03; 
+        if (this.scale > 1.0) this.scale -= 0.1; 
     }
     draw(ctx) {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.life);
         ctx.fillStyle = this.color;
         ctx.textAlign = "center";
-        
-        // Add a black outline so it's readable over bright video backgrounds
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 4;
-        
-        // Apply the shrinking Pop effect
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scale, this.scale);
-        
+        ctx.strokeStyle = "black"; ctx.lineWidth = 4;
+        ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
         ctx.font = "bold 32px 'Rajdhani', sans-serif";
-        ctx.strokeText(this.text, 0, 0);
-        ctx.fillText(this.text, 0, 0);
-        
+        ctx.strokeText(this.text, 0, 0); ctx.fillText(this.text, 0, 0);
         ctx.restore();
     }
 }
@@ -73,16 +59,14 @@ class InputHandler {
         window.addEventListener('keydown', (e) => {
             const lane = this.keyMap[e.key.toLowerCase()];
             if (lane !== undefined && lane < this.laneCount && !this.lanes[lane]) {
-                this.lanes[lane] = true;
-                this.onDown(lane);
+                this.lanes[lane] = true; this.onDown(lane);
             }
         });
 
         window.addEventListener('keyup', (e) => {
             const lane = this.keyMap[e.key.toLowerCase()];
             if (lane !== undefined && lane < this.laneCount) {
-                this.lanes[lane] = false;
-                this.onUp(lane);
+                this.lanes[lane] = false; this.onUp(lane);
             }
         });
     }
@@ -104,15 +88,11 @@ class Game {
         this.resultsScreen = document.getElementById('results-screen');
         
         this.laneCount = 3; 
-        this.score = 0;
-        this.combo = 0;
-        this.maxCombo = 0;
-        this.multiplier = 1;
-        this.laneWidth = 0;
-        this.laneFlashes = [0, 0, 0]; 
+        this.score = 0; this.combo = 0; this.maxCombo = 0; this.multiplier = 1;
+        this.laneWidth = 0; this.laneFlashes = [0, 0, 0]; 
         
-        this.particles = []; 
-        this.floatingTexts = []; // Array to hold the accuracy pop-ups
+        this.particles = []; this.floatingTexts = []; 
+        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // TRACKS FOR S-RANK
         this.isPlaying = false;
         
         this.noteManager = new NoteManager(this);
@@ -190,20 +170,16 @@ class Game {
         this.laneFlashes[lane] = 1.0; 
         
         const hitResult = this.noteManager.checkHit(lane, this.video.currentTime);
-        
         if (hitResult) {
-            // hitResult is now an object: { type, accuracy, points }
             this.registerHit(lane, hitResult.points, hitResult.accuracy);
         }
     }
 
     registerHit(lane, points, accuracyText) {
-
+        // --- RECORD STATS FOR FINAL GRADE ---
         if (accuracyText === "PERFECT") this.stats.perfect++;
         else if (accuracyText === "GREAT") this.stats.great++;
         else if (accuracyText === "GOOD") this.stats.good++;
-
-        this.combo++;
 
         this.combo++;
         if(this.combo > this.maxCombo) this.maxCombo = this.combo;
@@ -215,58 +191,43 @@ class Game {
         this.updateHUD();
         this.spawnParticles(lane);
 
-        // Determine Text Color based on Accuracy
-        let textColor = "#00eaff"; // Cyan for GOOD
-        if (accuracyText === "PERFECT") textColor = "#ffd700"; // Gold
-        if (accuracyText === "GREAT") textColor = "#00FF55"; // Green
+        let textColor = "#00eaff"; 
+        if (accuracyText === "PERFECT") textColor = "#ffd700"; 
+        if (accuracyText === "GREAT") textColor = "#00FF55"; 
 
         this.spawnFloatingText(lane, accuracyText, textColor);
-
         if (navigator.vibrate) navigator.vibrate(40);
     }
 
     handleHoldComplete(lane) {
-        // Holding successfully to the end is always a PERFECT 100 points
         this.registerHit(lane, 100, "PERFECT"); 
     }
 
     handleHoldBreak(lane) {
-        this.combo = 0;
-        this.multiplier = 1;
-        this.updateHUD();
-        this.spawnFloatingText(lane, "MISS", "#ff3333"); // Red Miss
+        this.stats.miss++; // COUNT MISS
+        this.combo = 0; this.multiplier = 1; this.updateHUD();
+        this.spawnFloatingText(lane, "MISS", "#ff3333"); 
         if (navigator.vibrate) navigator.vibrate(100);
-        this.stats.miss++; // NEW: Track the miss for the grade!
     }
     
-    // Now requires 'lane' parameter so it knows where to draw the MISS text
     handleMiss(lane) {
-        this.combo = 0;
-        this.multiplier = 1;
-        this.updateHUD();
-        
-        // Failsafe: if lane is somehow undefined, draw it in the middle
+        this.stats.miss++; // COUNT MISS
+        this.combo = 0; this.multiplier = 1; this.updateHUD();
         const targetLane = lane !== undefined ? lane : 1;
-        this.spawnFloatingText(targetLane, "MISS", "#ff3333"); // Red Miss
-        
+        this.spawnFloatingText(targetLane, "MISS", "#ff3333"); 
         if (navigator.vibrate) navigator.vibrate(100);
-        this.stats.miss++; // NEW: Track the miss for the grade!
     }
 
     spawnParticles(lane) {
         const x = (lane * this.laneWidth) + (this.laneWidth / 2);
         const y = this.canvas.height * 0.82; 
         const colors = ['#FF0055', '#00eaff', '#00FF55']; 
-        
-        for(let i=0; i<15; i++) {
-            this.particles.push(new Particle(x, y, colors[lane]));
-        }
+        for(let i=0; i<15; i++) { this.particles.push(new Particle(x, y, colors[lane])); }
     }
 
-    // --- NEW: Helper function to spawn the text ---
     spawnFloatingText(lane, text, color) {
         const x = (lane * this.laneWidth) + (this.laneWidth / 2);
-        const y = this.canvas.height * 0.78; // Spawn just slightly above the hit line
+        const y = this.canvas.height * 0.78; 
         this.floatingTexts.push(new FloatingText(x, y, text, color));
     }
 
@@ -274,7 +235,6 @@ class Game {
         this.scoreEl.innerText = "Score: " + this.score;
         this.comboCountEl.innerText = this.combo;
         if (this.multValEl) this.multValEl.innerText = "x" + this.multiplier;
-        
         const showHud = this.combo > 1 ? "1" : "0";
         if (this.comboHud) this.comboHud.style.opacity = showHud;
         if (this.multHud) this.multHud.style.opacity = showHud;
@@ -286,10 +246,7 @@ class Game {
         const videoUrl = songData.video.includes('/') ? songData.video : 'assets/video/' + songData.video;
         const dataUrl = songData.data.includes('/') ? songData.data : 'assets/data/' + songData.data;
 
-        this.video.src = videoUrl;
-        this.video.muted = true;
-        this.video.load();
-        
+        this.video.src = videoUrl; this.video.muted = true; this.video.load();
         this.resize();
         
         fetch(dataUrl)
@@ -305,31 +262,22 @@ class Game {
             })
             .catch(err => console.error("Data Load Error:", err));
         
-        // Reset everything, including the text array
         this.score = 0; this.combo = 0; this.multiplier = 1; 
         this.particles = []; this.floatingTexts = [];
+        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // RESET STATS
         this.updateHUD();
         this.resultsScreen.style.display = 'none';
         this.startBtn.style.display = 'block';
-
-        // Reset everything, including the stats array
-        this.score = 0; this.combo = 0; this.multiplier = 1; 
-        this.particles = []; this.floatingTexts = [];
-        this.stats = { perfect: 0, great: 0, good: 0, miss: 0 }; // NEW!
-        this.updateHUD();
     }
 
     startGame() {
         this.startBtn.style.display = 'none';
         this.video.muted = false;
         this.video.play().then(() => {
-            this.isPlaying = true;
-            this.loop();
+            this.isPlaying = true; this.loop();
         }).catch(e => {
-            this.video.muted = true;
-            this.video.play();
-            this.isPlaying = true;
-            this.loop();
+            this.video.muted = true; this.video.play();
+            this.isPlaying = true; this.loop();
         });
     }
 
@@ -362,7 +310,6 @@ class Game {
         this.particles.forEach(p => { p.update(); p.draw(this.ctx); });
         this.particles = this.particles.filter(p => p.life > 0);
 
-        // --- NEW: Draw the floating accuracy texts ---
         this.floatingTexts.forEach(t => { t.update(); t.draw(this.ctx); });
         this.floatingTexts = this.floatingTexts.filter(t => t.life > 0);
         
@@ -380,26 +327,26 @@ class Game {
         
         let hist = JSON.parse(localStorage.getItem(key)) || [];
         hist.push({ name: playerName, score: this.score, combo: this.maxCombo });
+       
         hist.sort((a,b) => b.score - a.score);
         localStorage.setItem(key, JSON.stringify(hist.slice(0, 5))); 
         
         document.getElementById('final-score-val').innerText = this.score;
         document.getElementById('final-combo-val').innerText = this.maxCombo;
-        
-        // --- NEW: S-RANK CALCULATOR ---
+
+        // --- CALCULATE S-RANK ---
         const totalNotes = this.stats.perfect + this.stats.great + this.stats.good + this.stats.miss;
         let percent = 0;
         if (totalNotes > 0) {
-            // Perfect is 100%, Great is 80%, Good is 50%, Miss is 0%
             percent = ((this.stats.perfect * 100) + (this.stats.great * 80) + (this.stats.good * 50)) / totalNotes;
         }
 
-        let grade = "F"; let color = "#ff3333"; // Red F
-        if (percent >= 95) { grade = "S"; color = "#ffd700"; }      // Gold S
-        else if (percent >= 85) { grade = "A"; color = "#00FF55"; } // Green A
-        else if (percent >= 75) { grade = "B"; color = "#00eaff"; } // Cyan B
-        else if (percent >= 60) { grade = "C"; color = "#ff8c00"; } // Orange C
-        else if (percent >= 50) { grade = "D"; color = "#aaaaaa"; } // Grey D
+        let grade = "F"; let color = "#ff3333"; 
+        if (percent >= 95) { grade = "S"; color = "#ffd700"; }      
+        else if (percent >= 85) { grade = "A"; color = "#00FF55"; } 
+        else if (percent >= 75) { grade = "B"; color = "#00eaff"; } 
+        else if (percent >= 60) { grade = "C"; color = "#ff8c00"; } 
+        else if (percent >= 50) { grade = "D"; color = "#aaaaaa"; } 
 
         const gradeDisplay = document.getElementById('final-grade-display');
         gradeDisplay.innerText = grade;
