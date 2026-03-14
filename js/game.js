@@ -173,11 +173,17 @@ class Game {
         this.score += points * this.multiplier;
         this.updateHUD();
         this.spawnParticles(lane);
+
+        // --- NEW: Haptic Pop (Success) ---
+        // A crisp 40ms vibration feels like a physical button click
+        if (navigator.vibrate) {
+            navigator.vibrate(40);
+        }
     }
 
     // Called by NoteManager when a hold finishes successfully
     handleHoldComplete(lane) {
-        this.registerHit(lane, 200); // Bonus points for holding!
+        this.registerHit(lane, 200); 
     }
 
     // Called by NoteManager if user lets go too early
@@ -185,13 +191,24 @@ class Game {
         this.combo = 0;
         this.multiplier = 1;
         this.updateHUD();
+
+        // --- NEW: Haptic Buzz (Combo Broken) ---
+        // A longer 100ms buzz so you physically feel the mistake
+        if (navigator.vibrate) {
+            navigator.vibrate(100);
+        }
     }
     
-    // Called by NoteManager if note falls past screen
+    // Called by NoteManager if note falls past screen completely
     handleMiss() {
         this.combo = 0;
         this.multiplier = 1;
         this.updateHUD();
+
+        // --- NEW: Haptic Buzz (Combo Broken) ---
+        if (navigator.vibrate) {
+            navigator.vibrate(100);
+        }
     }
 
     spawnParticles(lane) {
@@ -215,6 +232,7 @@ class Game {
     }
 
     loadLevel(songData) {
+        this.currentSongKey = songData.id || songData.title;
         this.currentSongId = songData.id; // Save ID for Leaderboard
         const videoUrl = songData.video.includes('/') ? songData.video : 'assets/video/' + songData.video;
         const dataUrl = songData.data.includes('/') ? songData.data : 'assets/data/' + songData.data;
@@ -290,11 +308,10 @@ class Game {
     finishGame() {
         this.isPlaying = false;
         
-        // --- LEADERBOARD SAVE LOGIC ---
+        // --- LEADERBOARD SAVE LOGIC FIX ---
         const playerName = window.currentPlayer || "Atlas";
-        const key = 'leaderboard_' + this.currentSongId;
+        const key = 'leaderboard_' + this.currentSongKey; // Now perfectly matches the song!
         
-        // Get old scores, add new one, sort, and save top 5
         let hist = JSON.parse(localStorage.getItem(key)) || [];
         hist.push({ name: playerName, score: this.score, combo: this.maxCombo });
         hist.sort((a,b) => b.score - a.score);

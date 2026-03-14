@@ -95,8 +95,8 @@ function openSongPreview(song) {
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
     document.getElementById('modal-difficulty').innerText = song.difficulty || "Normal";
 
-    const key = 'leaderboard_' + song.id;
-    let history = JSON.parse(localStorage.getItem(key)) || [];
+    const key = 'leaderboard_' + (song.id || song.title);
+    let history = JSON.parse(localStorage.getItem(key)) || []
     
     history.sort((a,b) => b.score - a.score); 
     
