@@ -5,7 +5,7 @@
     "artist": "Harry Styles",
     "video": "assets/video/as_it_was.mp4",
     "data": "assets/data/as_it_was.json",
-    "difficulty": "Normal"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "no-batido",
@@ -13,7 +13,7 @@
     "artist": "ZXKAI",
     "video": "assets/video/no_batido.mp4",
     "data": "assets/data/no_batido.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "passo-bem-solto",
@@ -21,7 +21,7 @@
     "artist": "Slowed Remix",
     "video": "assets/video/passo_solto.mp4",
     "data": "assets/data/passo_solto.json",
-    "difficulty": "Normal"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "los-volanie",
@@ -29,7 +29,7 @@
     "artist": "Phonk",
     "video": "assets/video/los_volanie.mp4",
     "data": "assets/data/los_volanie.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "montagem-tomoada",
@@ -37,7 +37,7 @@
     "artist": "Slowed",
     "video": "assets/video/montagem.mp4",
     "data": "assets/data/montagem.json",
-    "difficulty": "Expert"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "pinkpantheress",
@@ -45,7 +45,7 @@
     "artist": "PinkPantheress",
     "video": "assets/video/pinkpantheress.mp4",
     "data": "assets/data/pinkpantheress.json",
-    "difficulty": "Normal"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "metamorphosis",
@@ -53,7 +53,7 @@
     "artist": "Interworld",
     "video": "assets/video/metamorphosis.mp4",
     "data": "assets/data/metamorphosis.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "close-eyes",
@@ -61,7 +61,7 @@
     "artist": "DVRST",
     "video": "assets/video/close_eyes.mp4",
     "data": "assets/data/close_eyes.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   
   {
@@ -70,7 +70,7 @@
     "artist": "Sheet Music Boss",
     "video": "assets/video/rush_e.mp4",
     "data": "assets/data/rush_e.json",
-    "difficulty": "Expert"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "neon-blade",
@@ -78,7 +78,7 @@
     "artist": "MoonDeity",
     "video": "assets/video/neon_blade.mp4",
     "data": "assets/data/neon_blade.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "bones",
@@ -86,7 +86,7 @@
     "artist": "Imagine Dragons",
     "video": "assets/video/bones.mp4",
     "data": "assets/data/bones.json",
-    "difficulty": "Normal"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "narcissistic",
@@ -94,7 +94,7 @@
     "artist": "Odetari",
     "video": "assets/video/narcissistic.mp4",
     "data": "assets/data/narcissistic.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "toxic",
@@ -102,7 +102,7 @@
     "artist": "BoyWithUke",
     "video": "assets/video/toxic.mp4",
     "data": "assets/data/toxic.json",
-    "difficulty": "Normal"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "bbno$ vnlla",
@@ -110,7 +110,15 @@
     "artist": "bbno$",
     "video": "assets/video/bingbong.mp4",
     "data": "assets/data/bingbong.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "nc_rockefeller",
+    "title": "Rockefeller Street",
+    "artist": "Nightcore",
+    "video": "rockefeller.mp4",
+    "data": "nightcore_rockefeller.json",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
     "id": "kpop hunters",
@@ -118,6 +126,8 @@
     "artist": "huntrix",
     "video": "assets/video/golden.mp4",
     "data": "assets/data/golden.json",
-    "difficulty": "Hard"
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+    
   }
 ]
+

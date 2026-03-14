@@ -6,7 +6,7 @@ class NoteManager {
         this.laneWidth = 0;    
         
         this.noteSpeed = 2.0; 
-        this.hitLineY = 0.85; 
+        this.hitLineY = 0.82; 
     }
 
     loadSong(songData) {

@@ -88,15 +88,76 @@ async function initMenu() {
 }
 initMenu();
 
+// Add a global variable at the top of menu.js near your other 'let' statements:
+let selectedDifficulty = "Normal"; 
+
+// Replace the openSongPreview function:
 function openSongPreview(song) {
     selectedSongData = song;
     
     document.getElementById('modal-song-title').innerText = song.title;
     document.getElementById('modal-song-artist').innerText = song.artist || "Unknown Artist";
-    document.getElementById('modal-difficulty').innerText = song.difficulty || "Normal";
 
-    const key = 'leaderboard_' + (song.id || song.title);
-    let history = JSON.parse(localStorage.getItem(key)) || []
+    // 1. Build Difficulty Buttons
+    const diffContainer = document.getElementById('difficulty-selectors');
+    diffContainer.innerHTML = '';
+    
+    // Fallback if you haven't added difficulties to your json yet
+    const diffs = song.difficulties || ["Normal"]; 
+    selectedDifficulty = diffs[0]; // Default to the first one
+
+    diffs.forEach(diff => {
+        const btn = document.createElement('button');
+        btn.innerText = diff.toUpperCase();
+        // Give them that Gold/Red styling!
+        btn.style.cssText = `
+            background: rgba(0,0,0,0.5); color: #888; border: 2px solid #333; 
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; 
+            font-family: 'Rajdhani'; font-weight: bold; font-size: 14px;
+        `;
+        
+        btn.onclick = () => {
+            // Reset all buttons
+            Array.from(diffContainer.children).forEach(b => {
+                b.style.borderColor = '#333';
+                b.style.color = '#888';
+                b.style.boxShadow = 'none';
+            });
+            // Highlight selected button (Gold)
+            btn.style.borderColor = '#ffd700';
+            btn.style.color = 'white';
+            btn.style.boxShadow = '0 0 10px #ffd700';
+            
+            selectedDifficulty = diff;
+            updateLeaderboardDisplay(song.id, diff); // Refresh scores!
+        };
+        diffContainer.appendChild(btn);
+    });
+
+    // Auto-click the first difficulty to load the default leaderboard
+    if (diffContainer.firstChild) diffContainer.firstChild.click();
+
+    modal.style.display = 'flex';
+
+    stopPreview(); 
+    
+    const audioUrl = song.video.includes('/') ? song.video : 'assets/video/' + song.video;
+    currentAudioPreview = new Audio(audioUrl);
+    currentAudioPreview.addEventListener('loadedmetadata', () => {
+        currentAudioPreview.currentTime = currentAudioPreview.duration * 0.4;
+        currentAudioPreview.play().then(() => {
+            previewTimeout = setTimeout(() => {
+                if (currentAudioPreview) currentAudioPreview.pause();
+            }, 10000); 
+        }).catch(e => console.log("Preview autoplay blocked", e));
+    });
+}
+
+// 2. The function to swap leaderboards based on difficulty
+function updateLeaderboardDisplay(songId, difficulty) {
+    // Note how the save key now includes the difficulty! (e.g. "leaderboard_nc_rockefeller_Nightcore")
+    const key = 'leaderboard_' + (songId || "unknown") + "_" + difficulty;
+    let history = JSON.parse(localStorage.getItem(key)) || [];
     
     history.sort((a,b) => b.score - a.score); 
     
@@ -111,28 +172,26 @@ function openSongPreview(song) {
     const lbList = document.getElementById('modal-leaderboard-list');
     lbList.innerHTML = '';
     if (history.length === 0) {
-        lbList.innerHTML = '<li><span style="color:#ffd700;">No scores yet! Be the first!</span></li>'; // Gold text
+        lbList.innerHTML = '<li><span style="color:#ffd700;">No scores yet for this difficulty!</span></li>';
     } else {
         history.slice(0, 3).forEach(entry => { 
-            lbList.innerHTML += `<li><span style="color:#ffd700; font-weight:bold;">${entry.name}</span><span>${entry.score}</span></li>`; // Gold names
+            lbList.innerHTML += `<li><span style="color:#ffd700; font-weight:bold;">${entry.name}</span><span>${entry.score}</span></li>`;
         });
     }
-
-    modal.style.display = 'flex';
-
-    stopPreview(); 
-    
-    const audioUrl = song.video.includes('/') ? song.video : 'assets/video/' + song.video;
-    currentAudioPreview = new Audio(audioUrl);
-    currentAudioPreview.addEventListener('loadedmetadata', () => {
-        currentAudioPreview.currentTime = currentAudioPreview.duration * 0.4;
-        currentAudioPreview.play().then(() => {
-            previewTimeout = setTimeout(() => {
-                if (currentAudioPreview) currentAudioPreview.pause();
-            }, 10000); 
-        }).catch(e => console.log("Preview autoplay blocked by browser", e));
-    });
 }
+
+// 3. Update the START button to pass the difficulty to the game
+groovyBtn.onclick = () => {
+    stopPreview(); 
+    modal.style.display = 'none';
+    menuScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+    
+    if (window.gameInstance && selectedSongData) {
+        // We now hand the game the specific difficulty Atlas clicked!
+        window.gameInstance.loadLevel(selectedSongData, selectedDifficulty); 
+    }
+};
 
 function stopPreview() {
     if (currentAudioPreview) {

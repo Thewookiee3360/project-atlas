@@ -213,7 +213,7 @@ class Game {
 
     spawnParticles(lane) {
         const x = (lane * this.laneWidth) + (this.laneWidth / 2);
-        const y = this.canvas.height * 0.85; // Hit line
+        const y = this.canvas.height * 0.82; // Hit line
         const colors = ['#FF0055', '#00eaff', '#00FF55']; // Match lane colors
         
         for(let i=0; i<15; i++) {
@@ -231,8 +231,9 @@ class Game {
         if (this.multHud) this.multHud.style.opacity = showHud;
     }
 
-    loadLevel(songData) {
+    loadLevel(songData, difficulty) {
         this.currentSongKey = songData.id || songData.title;
+        this.currentSongKey = (songData.id || songData.title) + "_" + difficulty;
         this.currentSongId = songData.id; // Save ID for Leaderboard
         const videoUrl = songData.video.includes('/') ? songData.video : 'assets/video/' + songData.video;
         const dataUrl = songData.data.includes('/') ? songData.data : 'assets/data/' + songData.data;
@@ -283,7 +284,7 @@ class Game {
         }
 
         // Draw Gold Hit Targets
-        const hitY = this.canvas.height * 0.85; 
+        const hitY = this.canvas.height * 0.82; 
         const targetHeight = 60;
         
         for(let i=0; i<3; i++) {
@@ -308,9 +309,9 @@ class Game {
     finishGame() {
         this.isPlaying = false;
         
-        // --- LEADERBOARD SAVE LOGIC FIX ---
         const playerName = window.currentPlayer || "Atlas";
-        const key = 'leaderboard_' + this.currentSongKey; // Now perfectly matches the song!
+        // It saves using the new key, meaning Easy and Nightcore have separate leaderboards!
+        const key = 'leaderboard_' + this.currentSongKey; 
         
         let hist = JSON.parse(localStorage.getItem(key)) || [];
         hist.push({ name: playerName, score: this.score, combo: this.maxCombo });
@@ -320,11 +321,6 @@ class Game {
         document.getElementById('final-score-val').innerText = this.score;
         document.getElementById('final-combo-val').innerText = this.maxCombo;
         this.resultsScreen.style.display = 'flex';
-    }
-
-    restartGame() {
-        this.resultsScreen.style.display = 'none';
-        this.startGame();
     }
 
     quitToMenu() {
