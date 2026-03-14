@@ -9,8 +9,8 @@ class Particle {
     }
     update() {
         this.x += this.speedX; this.y += this.speedY;
-        this.life -= 0.05; // Fade out
-        this.size *= 0.95; // Shrink
+        this.life -= 0.05; 
+        this.size *= 0.95; 
     }
     draw(ctx) {
         ctx.globalAlpha = Math.max(0, this.life);
@@ -19,6 +19,38 @@ class Particle {
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1.0;
+    }
+}
+
+// --- NEW: FLOATING TEXT SYSTEM ---
+class FloatingText {
+    constructor(x, y, text, color) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.life = 1.0;
+        this.speedY = -1.5; // Drift upwards slowly
+    }
+    update() {
+        this.y += this.speedY;
+        this.life -= 0.03; // Fade out quickly
+    }
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        // Cool arcade font styling
+        ctx.font = "bold 32px 'Rajdhani', sans-serif";
+        ctx.textAlign = "center";
+        
+        // Add a black outline so it's readable over bright video backgrounds
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 4;
+        ctx.strokeText(this.text, this.x, this.y);
+        ctx.fillText(this.text, this.x, this.y);
+        
+        ctx.restore();
     }
 }
 
@@ -73,9 +105,9 @@ class Game {
         this.laneWidth = 0;
         this.laneFlashes = [0, 0, 0]; 
         
-        this.particles = []; // Particle Array
+        this.particles = []; 
+        this.floatingTexts = []; // Array to hold the accuracy pop-ups
         this.isPlaying = false;
-        this.currentSongId = "unknown"; // For Leaderboard
         
         this.noteManager = new NoteManager(this);
         this.input = new InputHandler(this.laneCount, (lane) => this.handleInputDown(lane), (lane) => {});
@@ -91,11 +123,8 @@ class Game {
         this.startBtn.onclick = startGameWrapper;
         this.startBtn.ontouchstart = startGameWrapper;
 
-        // Unified Touch Support
         this.canvas.addEventListener('touchstart', (e) => this.handleTouch(e, true), {passive: false});
         this.canvas.addEventListener('touchend', (e) => this.handleTouch(e, false), {passive: false});
-        
-        // Unified Mouse Support
         this.canvas.addEventListener('mousedown', (e) => this.handleMouse(e, true));
         this.canvas.addEventListener('mouseup', (e) => this.handleMouse(e, false));
         
@@ -122,7 +151,7 @@ class Game {
         if(e.target === this.canvas) e.preventDefault();
         const rect = this.canvas.getBoundingClientRect();
         
-        if (!isDown && e.touches.length === 0) this.input.lanes.fill(false); // Reset all if fingers lifted
+        if (!isDown && e.touches.length === 0) this.input.lanes.fill(false); 
         
         for (let i = 0; i < e.changedTouches.length; i++) {
             const t = e.changedTouches[i];
@@ -131,7 +160,7 @@ class Game {
             if (relativeX >= 0 && relativeX <= rect.width) {
                 const lane = Math.floor(relativeX / this.laneWidth);
                 if (lane >= 0 && lane < this.laneCount) {
-                    this.input.lanes[lane] = isDown; // Tell NoteManager the lane is held
+                    this.input.lanes[lane] = isDown; 
                     if (isDown) this.handleInputDown(lane);
                 }
             }
@@ -144,7 +173,7 @@ class Game {
         if (relativeX >= 0 && relativeX <= rect.width) {
             const lane = Math.floor(relativeX / this.laneWidth);
             if (lane >= 0 && lane < this.laneCount) {
-                this.input.lanes[lane] = isDown; // Tell NoteManager the lane is held
+                this.input.lanes[lane] = isDown; 
                 if (isDown) this.handleInputDown(lane);
             }
         }
@@ -156,14 +185,13 @@ class Game {
         
         const hitResult = this.noteManager.checkHit(lane, this.video.currentTime);
         
-        if (hitResult === 'tap') {
-            this.registerHit(lane, 100);
-        } else if (hitResult === 'hold_start') {
-            this.spawnParticles(lane); // Just visuals for starting the hold
+        if (hitResult) {
+            // hitResult is now an object: { type, accuracy, points }
+            this.registerHit(lane, hitResult.points, hitResult.accuracy);
         }
     }
 
-    registerHit(lane, points) {
+    registerHit(lane, points, accuracyText) {
         this.combo++;
         if(this.combo > this.maxCombo) this.maxCombo = this.combo;
         
@@ -174,51 +202,57 @@ class Game {
         this.updateHUD();
         this.spawnParticles(lane);
 
-        // --- NEW: Haptic Pop (Success) ---
-        // A crisp 40ms vibration feels like a physical button click
-        if (navigator.vibrate) {
-            navigator.vibrate(40);
-        }
+        // Determine Text Color based on Accuracy
+        let textColor = "#00eaff"; // Cyan for GOOD
+        if (accuracyText === "PERFECT") textColor = "#ffd700"; // Gold
+        if (accuracyText === "GREAT") textColor = "#00FF55"; // Green
+
+        this.spawnFloatingText(lane, accuracyText, textColor);
+
+        if (navigator.vibrate) navigator.vibrate(40);
     }
 
-    // Called by NoteManager when a hold finishes successfully
     handleHoldComplete(lane) {
-        this.registerHit(lane, 200); 
+        // Holding successfully to the end is always a PERFECT 100 points
+        this.registerHit(lane, 100, "PERFECT"); 
     }
 
-    // Called by NoteManager if user lets go too early
     handleHoldBreak(lane) {
         this.combo = 0;
         this.multiplier = 1;
         this.updateHUD();
-
-        // --- NEW: Haptic Buzz (Combo Broken) ---
-        // A longer 100ms buzz so you physically feel the mistake
-        if (navigator.vibrate) {
-            navigator.vibrate(100);
-        }
+        this.spawnFloatingText(lane, "MISS", "#ff3333"); // Red Miss
+        if (navigator.vibrate) navigator.vibrate(100);
     }
     
-    // Called by NoteManager if note falls past screen completely
-    handleMiss() {
+    // Now requires 'lane' parameter so it knows where to draw the MISS text
+    handleMiss(lane) {
         this.combo = 0;
         this.multiplier = 1;
         this.updateHUD();
-
-        // --- NEW: Haptic Buzz (Combo Broken) ---
-        if (navigator.vibrate) {
-            navigator.vibrate(100);
-        }
+        
+        // Failsafe: if lane is somehow undefined, draw it in the middle
+        const targetLane = lane !== undefined ? lane : 1;
+        this.spawnFloatingText(targetLane, "MISS", "#ff3333"); // Red Miss
+        
+        if (navigator.vibrate) navigator.vibrate(100);
     }
 
     spawnParticles(lane) {
         const x = (lane * this.laneWidth) + (this.laneWidth / 2);
-        const y = this.canvas.height * 0.82; // Hit line
-        const colors = ['#FF0055', '#00eaff', '#00FF55']; // Match lane colors
+        const y = this.canvas.height * 0.82; 
+        const colors = ['#FF0055', '#00eaff', '#00FF55']; 
         
         for(let i=0; i<15; i++) {
             this.particles.push(new Particle(x, y, colors[lane]));
         }
+    }
+
+    // --- NEW: Helper function to spawn the text ---
+    spawnFloatingText(lane, text, color) {
+        const x = (lane * this.laneWidth) + (this.laneWidth / 2);
+        const y = this.canvas.height * 0.78; // Spawn just slightly above the hit line
+        this.floatingTexts.push(new FloatingText(x, y, text, color));
     }
 
     updateHUD() {
@@ -232,9 +266,8 @@ class Game {
     }
 
     loadLevel(songData, difficulty) {
-        this.currentSongKey = songData.id || songData.title;
-        this.currentSongKey = (songData.id || songData.title) + "_" + difficulty;
-        this.currentSongId = songData.id; // Save ID for Leaderboard
+        this.currentSongKey = (songData.id || songData.title) + "_" + difficulty; 
+
         const videoUrl = songData.video.includes('/') ? songData.video : 'assets/video/' + songData.video;
         const dataUrl = songData.data.includes('/') ? songData.data : 'assets/data/' + songData.data;
 
@@ -249,10 +282,17 @@ class Game {
                 if (!res.ok) throw new Error("Could not find file at: " + dataUrl);
                 return res.json();
             })
-            .then(data => this.noteManager.loadSong(data))
+            .then(data => {
+                let levelData = [];
+                if (data[difficulty]) levelData = data[difficulty]; 
+                else levelData = data; 
+                this.noteManager.loadSong(levelData);
+            })
             .catch(err => console.error("Data Load Error:", err));
         
-        this.score = 0; this.combo = 0; this.multiplier = 1; this.particles = [];
+        // Reset everything, including the text array
+        this.score = 0; this.combo = 0; this.multiplier = 1; 
+        this.particles = []; this.floatingTexts = [];
         this.updateHUD();
         this.resultsScreen.style.display = 'none';
         this.startBtn.style.display = 'block';
@@ -276,20 +316,18 @@ class Game {
         if(!this.isPlaying) return;
         this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
         
-        // Draw Lane Separators
         for(let i=0; i<3; i++) {
             this.ctx.strokeStyle = "rgba(255,255,255,0.1)";
             this.ctx.lineWidth = 1;
             this.ctx.strokeRect(i*this.laneWidth, 0, this.laneWidth, this.canvas.height);
         }
 
-        // Draw Gold Hit Targets
         const hitY = this.canvas.height * 0.82; 
         const targetHeight = 60;
         
         for(let i=0; i<3; i++) {
             const opacity = 0.2 + (this.laneFlashes[i] * 0.8); 
-            this.ctx.strokeStyle = `rgba(255, 215, 0, ${opacity})`; // Glowing Gold!
+            this.ctx.strokeStyle = `rgba(255, 215, 0, ${opacity})`; 
             this.ctx.lineWidth = 4 + (this.laneFlashes[i] * 4);
             const w = this.laneWidth * 0.8;
             const x = (i * this.laneWidth) + (this.laneWidth * 0.1);
@@ -302,6 +340,10 @@ class Game {
         
         this.particles.forEach(p => { p.update(); p.draw(this.ctx); });
         this.particles = this.particles.filter(p => p.life > 0);
+
+        // --- NEW: Draw the floating accuracy texts ---
+        this.floatingTexts.forEach(t => { t.update(); t.draw(this.ctx); });
+        this.floatingTexts = this.floatingTexts.filter(t => t.life > 0);
         
         requestAnimationFrame(() => this.loop());
     }
@@ -310,7 +352,6 @@ class Game {
         this.isPlaying = false;
         
         const playerName = window.currentPlayer || "Atlas";
-        // It saves using the new key, meaning Easy and Nightcore have separate leaderboards!
         const key = 'leaderboard_' + this.currentSongKey; 
         
         let hist = JSON.parse(localStorage.getItem(key)) || [];
@@ -321,6 +362,11 @@ class Game {
         document.getElementById('final-score-val').innerText = this.score;
         document.getElementById('final-combo-val').innerText = this.maxCombo;
         this.resultsScreen.style.display = 'flex';
+    }
+
+    restartGame() {
+        this.resultsScreen.style.display = 'none';
+        this.startGame();
     }
 
     quitToMenu() {

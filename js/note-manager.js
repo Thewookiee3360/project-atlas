@@ -36,7 +36,6 @@ class NoteManager {
         for (let i = this.activeNotes.length - 1; i >= 0; i--) {
             const note = this.activeNotes[i];
             
-            // --- HOLD NOTE LOGIC ---
             if (note.isHeld) {
                 note.y = this.game.canvas.height * this.hitLineY;
                 
@@ -45,10 +44,10 @@ class NoteManager {
                     if(this.game.handleHoldComplete) this.game.handleHoldComplete(note.lane);
                 } else if (!this.game.input.lanes[note.lane]) {
                     this.activeNotes.splice(i, 1);
-                    if(this.game.handleHoldBreak) this.game.handleHoldBreak(note.lane);
+                    // Tell the game exactly which lane we let go of early!
+                    if(this.game.handleHoldBreak) this.game.handleHoldBreak(note.lane); 
                 }
             } else {
-                // --- NORMAL FALLING LOGIC ---
                 const timeUntilHit = note.time - currentTime;
                 const progress = 1 - (timeUntilHit / this.noteSpeed);
                 note.y = (progress * this.game.canvas.height * this.hitLineY);
@@ -57,14 +56,15 @@ class NoteManager {
 
                 if (note.y > this.game.canvas.height + 100 + holdDelay) {
                     this.activeNotes.splice(i, 1);
-                    if(this.game.handleMiss) this.game.handleMiss(); 
+                    // Tell the game exactly which lane we missed!
+                    if(this.game.handleMiss) this.game.handleMiss(note.lane); 
                 }
             }
         }
     }
 
     checkHit(lane, currentTime) {
-        const hitWindow = 0.30; 
+        const hitWindow = 0.20; // 200ms is the maximum window to get a "GOOD"
 
         for (let i = 0; i < this.activeNotes.length; i++) {
             const note = this.activeNotes[i];
@@ -73,20 +73,32 @@ class NoteManager {
                 const timeDiff = Math.abs(note.time - currentTime);
                 
                 if (timeDiff <= hitWindow) {
+                    
+                    // --- THE NEW ACCURACY MATH ---
+                    let accuracy = "GOOD";
+                    let points = 50;
+                    
+                    if (timeDiff <= 0.05) { 
+                        accuracy = "PERFECT"; 
+                        points = 100; 
+                    } else if (timeDiff <= 0.12) { 
+                        accuracy = "GREAT"; 
+                        points = 75; 
+                    }
+
                     if (note.duration && note.duration > 0) {
                         note.isHeld = true;
-                        return 'hold_start';
+                        return { type: 'hold_start', accuracy: accuracy, points: points };
                     } else {
                         this.activeNotes.splice(i, 1);
-                        return 'tap';
+                        return { type: 'tap', accuracy: accuracy, points: points };
                     }
                 }
             }
         }
-        return false;
+        return false; // Nothing hit
     }
 
-    // --- DRAWING SECTION (SEMI-TRANSPARENT & LESS BRIGHT) ---
     draw(ctx) {
         if (!this.game.laneWidth) return; 
         const laneWidth = this.game.laneWidth;
@@ -94,7 +106,6 @@ class NoteManager {
         this.activeNotes.forEach(note => {
             const x = (note.lane * laneWidth) + (laneWidth / 2);
             const y = note.y;
-            // Get the new semi-transparent rgba color
             const baseColor = this.getNoteColor(note.lane);
 
             const w = laneWidth * 0.7; 
@@ -111,44 +122,36 @@ class NoteManager {
             if (isNaN(h) || h < 50) h = 50;
 
             ctx.save(); 
-
-            // 1. The Glow (Reduced intensity)
-            ctx.shadowBlur = 10; // Reduced from 20 for less brightness
-            ctx.shadowColor = baseColor; // The glow itself is now semi-transparent too
+            ctx.shadowBlur = 10; 
+            ctx.shadowColor = baseColor; 
             ctx.fillStyle = baseColor;
 
             const drawX = x - (w / 2);
             const drawY = y - h;
             const radius = 12;
 
-            // 2. Draw Rounded Body (Semi-transparent fill)
             this.drawRoundedPath(ctx, drawX, drawY, w, h, radius);
             ctx.fill();
 
-            // 3. Draw White Border (Kept opaque for definition)
-            ctx.lineWidth = 2; // Slightly thinner border
+            ctx.lineWidth = 2; 
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
             this.drawRoundedPath(ctx, drawX, drawY, w, h, radius);
             ctx.stroke();
 
-            // 4. Draw "Hold Line" Stream (Toned down brightness)
             if (h > 60) { 
                 ctx.beginPath();
                 ctx.moveTo(x, drawY + radius); 
                 ctx.lineTo(x, y - radius);     
                 ctx.lineWidth = 4;
-                // Toned down from 0.9 opacity to 0.5
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; 
-                ctx.shadowBlur = 5; // Reduced glow on the center line
+                ctx.shadowBlur = 5; 
                 ctx.shadowColor = 'white'; 
                 ctx.stroke();
             }
-
             ctx.restore(); 
         });
     }
 
-    // Helper function for rounded rectangles
     drawRoundedPath(ctx, x, y, width, height, radius) {
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -164,11 +167,10 @@ class NoteManager {
     }
 
     getNoteColor(lane) {
-        // Red, Gold, and Dark Orange for a warm/fiery aesthetic
         const colors = [
-            'rgba(255, 51, 51, 0.6)',   // Lane 0: Red
-            'rgba(255, 215, 0, 0.6)',   // Lane 1: Gold
-            'rgba(255, 140, 0, 0.6)'    // Lane 2: Orange
+            'rgba(255, 51, 51, 0.6)',   
+            'rgba(255, 215, 0, 0.6)',   
+            'rgba(255, 140, 0, 0.6)'    
         ]; 
         return colors[lane] || 'rgba(255, 215, 0, 0.6)';
     }
