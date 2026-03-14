@@ -357,11 +357,17 @@ class Game {
     finishGame() {
         this.isPlaying = false;
         
+        // --- NEW: PLAY THE CHEER AUDIO ---
+        // Assumes your file is in an audio folder! Adjust path if needed.
+        const cheerAudio = new Audio('assets/audio/cheer.mp3'); 
+        cheerAudio.play().catch(e => console.log("Cheer blocked by browser", e));
+
         const playerName = window.currentPlayer || "Atlas";
         const key = 'leaderboard_' + this.currentSongKey; 
         
         let hist = JSON.parse(localStorage.getItem(key)) || [];
         hist.push({ name: playerName, score: this.score, combo: this.maxCombo });
+       
         hist.sort((a,b) => b.score - a.score);
         localStorage.setItem(key, JSON.stringify(hist.slice(0, 5))); 
         

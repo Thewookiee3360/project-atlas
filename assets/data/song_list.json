@@ -5,6 +5,7 @@
     "artist": "Harry Styles",
     "video": "assets/video/as_it_was.mp4",
     "data": "assets/data/as_it_was.json",
+    "cover": "assets/images/as_it_was_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -13,6 +14,7 @@
     "artist": "ZXKAI",
     "video": "assets/video/no_batido.mp4",
     "data": "assets/data/no_batido.json",
+    "cover": "assets/images/no_batido_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -21,6 +23,7 @@
     "artist": "Slowed Remix",
     "video": "assets/video/passo_solto.mp4",
     "data": "assets/data/passo_solto.json",
+    "cover": "assets/images/passo_solto_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -29,6 +32,7 @@
     "artist": "Phonk",
     "video": "assets/video/los_volanie.mp4",
     "data": "assets/data/los_volanie.json",
+    "cover": "assets/images/los_volanie_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -37,6 +41,7 @@
     "artist": "Slowed",
     "video": "assets/video/montagem.mp4",
     "data": "assets/data/montagem.json",
+    "cover": "assets/images/montagem_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -45,6 +50,7 @@
     "artist": "PinkPantheress",
     "video": "assets/video/pinkpantheress.mp4",
     "data": "assets/data/pinkpantheress.json",
+    "cover": "assets/images/pinkpantheress_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -53,6 +59,7 @@
     "artist": "Interworld",
     "video": "assets/video/metamorphosis.mp4",
     "data": "assets/data/metamorphosis.json",
+    "cover": "assets/images/metamorphosis_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -61,6 +68,7 @@
     "artist": "DVRST",
     "video": "assets/video/close_eyes.mp4",
     "data": "assets/data/close_eyes.json",
+    "cover": "assets/images/close_eyes_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   
@@ -70,6 +78,7 @@
     "artist": "Sheet Music Boss",
     "video": "assets/video/rush_e.mp4",
     "data": "assets/data/rush_e.json",
+    "cover": "assets/images/rush_e_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -78,6 +87,7 @@
     "artist": "MoonDeity",
     "video": "assets/video/neon_blade.mp4",
     "data": "assets/data/neon_blade.json",
+    "cover": "assets/images/neon_blade_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -86,6 +96,7 @@
     "artist": "Imagine Dragons",
     "video": "assets/video/bones.mp4",
     "data": "assets/data/bones.json",
+    "cover": "assets/images/bones_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -94,6 +105,7 @@
     "artist": "Odetari",
     "video": "assets/video/narcissistic.mp4",
     "data": "assets/data/narcissistic.json",
+    "cover": "assets/images/narcissistic_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -102,6 +114,7 @@
     "artist": "BoyWithUke",
     "video": "assets/video/toxic.mp4",
     "data": "assets/data/toxic.json",
+    "cover": "assets/images/toxic_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -110,6 +123,7 @@
     "artist": "bbno$",
     "video": "assets/video/bingbong.mp4",
     "data": "assets/data/bingbong.json",
+    "cover": "assets/images/bingbong_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -118,6 +132,7 @@
     "artist": "Nightcore",
     "video": "rockefeller.mp4",
     "data": "nightcore_rockefeller.json",
+    "cover": "assets/images/rockefeller_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
   },
   {
@@ -126,6 +141,7 @@
     "artist": "huntrix",
     "video": "assets/video/golden.mp4",
     "data": "assets/data/golden.json",
+    "cover": "assets/images/golden_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
     
   }

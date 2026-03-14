@@ -148,3 +148,43 @@ html, body {
 #results-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,10,0.95); z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .result-box { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 24px; margin-bottom: 30px; }
 .result-buttons button { padding: 15px 40px; margin: 10px; font-size: 22px; font-family: 'Rajdhani'; background: transparent; color: white; border: 2px solid #ffd700; border-radius: 8px; cursor: pointer;}
+
+/* --- NEW: HAMBURGER & SIDEBAR --- */
+#hamburger-btn { 
+    position: absolute; top: 20px; left: 20px; font-size: 35px; 
+    background: none; border: none; color: #ffd700; cursor: pointer; 
+    z-index: 105; text-shadow: 0 0 10px #ff3333; transition: transform 0.2s;
+}
+#hamburger-btn:active { transform: scale(0.9); }
+
+#sidebar { 
+    position: absolute; top: 0; left: -320px; /* Hidden off-screen */
+    width: 300px; height: 100%; background: rgba(5, 5, 15, 0.98); 
+    border-right: 3px solid #ffd700; z-index: 110; transition: left 0.3s ease-in-out; 
+    display: flex; flex-direction: column; align-items: center; padding-top: 20px; 
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8); overflow-y: auto;
+}
+#sidebar.open { left: 0; } /* Slides it in! */
+
+#close-sidebar-btn { 
+    position: absolute; top: 15px; right: 15px; background: none; 
+    border: none; color: #ff3333; font-size: 28px; cursor: pointer; 
+}
+
+#sidebar h2 { color: #ffd700; font-size: 24px; margin-top: 30px; border-bottom: 2px solid #ff3333; padding-bottom: 5px;}
+
+/* Rotating Leaderboard Text Styles */
+#rotating-leaderboard { width: 90%; color: white; margin-top: 10px; text-align: left; }
+.lb-song-title { color: #fff; font-size: 20px; text-align: center; margin-bottom: 15px; text-shadow: 0 0 8px #ff3333;}
+.lb-top3 { font-size: 18px; font-weight: bold; color: #ffd700; margin: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 4px;}
+.lb-others { font-size: 14px; color: #aaa; margin: 5px 0; display: flex; justify-content: space-between; }
+
+/* --- NEW: DYNAMIC ALBUM COVERS --- */
+/* (This applies to both the mini cards and the big pop-up modal) */
+.song-card {
+    background-size: cover; background-position: center;
+    /* We use JS to add the image, but CSS handles the dark overlay */
+}
+.modal-content {
+    background-size: cover; background-position: center;
+}
