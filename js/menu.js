@@ -196,3 +196,17 @@ document.getElementById('back-to-menu-btn').addEventListener('click', () => {
     gameContainer.style.display = 'none';
     menuScreen.style.display = 'flex';
 });
+
+// --- SIDEBAR LOGIC ---
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebar = document.getElementById('sidebar');
+const closeSidebar = document.getElementById('close-sidebar');
+
+if (hamburgerBtn && sidebar && closeSidebar) {
+    hamburgerBtn.onclick = () => {
+        sidebar.classList.add('open');
+    };
+    closeSidebar.onclick = () => {
+        sidebar.classList.remove('open');
+    };
+}
