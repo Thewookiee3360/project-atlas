@@ -151,6 +151,95 @@
     "data": "assets/data/angel_with_a_shotgun.json",
     "cover": "assets/images/angel_with_a_shotgun_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "every time we touch",
+    "title": "every time we touch",
+    "artist": "Nightcore",
+    "video": "assets/video/every_time_we_touch.mp4",
+    "data": "assets/data/every_time_we_touch.json",
+    "cover": "assets/images/every_time_we_touch_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "bring me to life",
+    "title": "Bring Me to Life",
+    "artist": "Evanescence",
+    "video": "assets/video/bring_me_to_life.mp4",
+    "data": "assets/data/bring_me_to_life.json",
+    "cover": "assets/images/bring_me_to_life_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "centuires",
+    "title": "Centuires",
+    "artist": "Nightcore",
+    "video": "assets/video/centuires.mp4",
+    "data": "assets/data/centuires.json",
+    "cover": "assets/images/centuires_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "Hero",
+    "title": "Hero",
+    "artist": "Nightcore",
+    "video": "assets/video/hero.mp4",
+    "data": "assets/data/hero.json",
+    "cover": "assets/images/hero_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "Human",
+    "title": "Human",
+    "artist": "Nightcore",
+    "video": "assets/video/human.mp4",
+    "data": "assets/data/human.json",
+    "cover": "assets/images/human_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "symphony",
+    "title": "Symphony",
+    "artist": "Nightcore",
+    "video": "assets/video/symphony.mp4",
+    "data": "assets/data/symphony.json",
+    "cover": "assets/images/symphony_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "take a hint",
+    "title": "Take a Hint",
+    "artist": "Nightcore",
+    "video": "assets/video/take_a_hint.mp4",
+    "data": "assets/data/take_a_hint.json",
+    "cover": "assets/images/take_a_hint_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "monsters",
+    "title": "Monsters",
+    "artist": "Nightcore",
+    "video": "assets/video/monsters.mp4",
+    "data": "assets/data/monsters.json",
+    "cover": "assets/images/monsters_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "this little girl",
+    "title": "This Little Girl",
+    "artist": "Nightcore",
+    "video": "assets/video/this_little_girl.mp4",
+    "data": "assets/data/this_little_girl.json",
+    "cover": "assets/images/this_little_girl_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "shatter me",
+    "title": "Shatter Me",
+    "artist": "Nightcore",
+    "video": "assets/video/shatter_me.mp4",
+    "data": "assets/data/shatter_me.json",
+    "cover": "assets/images/shatter_me_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   }
-  
 ]
