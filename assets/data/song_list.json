@@ -114,7 +114,7 @@
     "video": "assets/video/toxic.mp4",
     "data": "assets/data/toxic.json",
     "cover": "assets/images/toxic_cover.jpg",
-    "difficulties": ["Easy", "Hard", "Nightmare"]
+    "difficulties": ["Easy", "Hard"]
   },
   {
     "id": "bbno-vnlla",
@@ -142,5 +142,15 @@
     "data": "assets/data/golden.json",
     "cover": "assets/images/golden_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "Angel with a Shotgun",
+    "title": "angel with a shotgun",
+    "artist": "Nightcore",
+    "video": "assets/video/angel_with_a_shotgun.mp4",
+    "data": "assets/data/angel_with_a_shotgun.json",
+    "cover": "assets/images/angel_with_a_shotgun_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   }
+  
 ]
