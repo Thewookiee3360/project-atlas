@@ -241,5 +241,14 @@
     "data": "assets/data/shatter_me.json",
     "cover": "assets/images/shatter_me_cover.jpg",
     "difficulties": ["Easy", "Hard", "Nightmare"]
+  },
+  {
+    "id": "I run",
+    "title": "I Run",
+    "artist": "Nightcore",
+    "video": "assets/video/i_run.mp4",
+    "data": "assets/data/i_run.json",
+    "cover": "assets/images/i_run_cover.jpg",
+    "difficulties": ["Easy", "Hard", "Nightmare"]
   }
 ]
